@@ -52,6 +52,10 @@ Window::Window(HINSTANCE hInstance, int w, int h )
 
 Window::~Window() 
 {
+  release();
+}
+
+void Window::release() {
 	DestroyWindow(descriptor);
 }
 

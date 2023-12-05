@@ -159,6 +159,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controllers\MsgHandler.cpp" />
     <ClCompile Include="src\Entity\Camera.cpp" />
     <ClCompile Include="src\Entity\Pyramid.cpp" />
     <ClCompile Include="src\Entity\Sphera.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Controllers\MsgHandler.h" />
     <ClInclude Include="src\Entity\AbstractEntity.h" />
     <ClInclude Include="src\Entity\AbstractFigure.h" />
     <ClInclude Include="src\Entity\Camera.h" />

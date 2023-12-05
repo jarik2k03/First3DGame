@@ -10,6 +10,7 @@
     <ClCompile Include="src\Entity\Pyramid.cpp" />
     <ClCompile Include="src\Entity\Sphera.cpp" />
     <ClCompile Include="src\Entity\Triangle.cpp" />
+    <ClCompile Include="src\Controllers\MsgHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Window.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="src\Entity\Sphera.h" />
     <ClInclude Include="src\Entity\Triangle.h" />
     <ClInclude Include="src\_Commons\alias.h" />
+    <ClInclude Include="src\Controllers\MsgHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\icons\dx11.ico" />

@@ -22,4 +22,5 @@ class Window {
   }
   Window(HINSTANCE hInstance, int w = 1920, int h = 1080);
   ~Window();
+  void release();
 };

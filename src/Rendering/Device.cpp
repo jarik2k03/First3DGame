@@ -49,7 +49,7 @@ Device::Device(HWND wd) : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_D
   ic->RSSetViewports(1, &vp); // привязываем к контексту устройства
 }
 
-Device::~Device() {
+void Device::release() {
   if (ic)
     ic->ClearState();
   if (renderTargetView)
@@ -60,6 +60,10 @@ Device::~Device() {
     ic->Release();
   if (d3d)
     d3d->Release();
+}
+
+Device::~Device() {
+  release();
 }
 
 DXGI_SWAP_CHAIN_DESC Device::setSwapChainDesc(
@@ -113,5 +117,6 @@ void Device::renderEnd() {
 
 void Device::switchFullScreen() {
   fullscreen = (bool)fullscreen ^ 1;
-  swapChain->SetFullscreenState((~fullscreen) & 0x1, NULL);
+  swapChain->SetFullscreenState(fullscreen, NULL);
+  
 }

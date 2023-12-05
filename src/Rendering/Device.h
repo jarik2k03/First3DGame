@@ -30,6 +30,8 @@ class Device {
   static ID3D11DeviceContext* ic;
   Device(HWND wd);
   ~Device();
+  
+
   void renderStart();
   void renderEnd();
 
@@ -40,4 +42,5 @@ class Device {
     return renderTargetView;
   }
   void switchFullScreen();
+  void release();
 };

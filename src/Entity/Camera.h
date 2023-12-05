@@ -1,17 +1,16 @@
 #pragma once
-#include <windows.h>
-#include <d3d11.h>
-#include <d3dx11.h>
+#include <Rendering/Device.h>
 #include <xnamath.h>
+#include<_Commons/alias.h>
 
 class Camera
 {
 public:
-	Camera(HWND hWnd, FLOAT objectiveWidth);
-	XMMATRIX* getViewMatrix() { return &matrixView; }
-	XMMATRIX* getProjMatrix() { return &matrixPerspective; }
+	Camera(int w, int h, FLOAT objectiveWidth);
+	XMMATRIX& m_view() { return m_view_; }
+	XMMATRIX& m_proj() { return m_proj_; }
 protected:
-	XMMATRIX matrixView;
-	XMMATRIX matrixPerspective;
+ XMMATRIX m_view_;
+ XMMATRIX m_proj_;
 };
 

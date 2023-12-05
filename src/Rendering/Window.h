@@ -1,21 +1,25 @@
 #pragma once
-#include <d3dx11.h>
+
 #include <windows.h>
-#include <iostream>
-#include "../Resources/resource.h"
+#include <Resources/resource.h>
 
-class Window
-{
-private:
-	HWND descriptor;
-	WNDCLASSEX wcex;
-	int width;
-	int height;
-public:
-	inline HWND getWd() { return this->descriptor;}
-	Window(HINSTANCE hInstance, int w = 1920, int h = 1080);
-	~Window();
+class Window {
+ private:
+  HWND descriptor;
+  WNDCLASSEX wcex;
+  int width_;
+  int height_;
 
+ public:
+  int width() {
+    return width_;
+  }
+  int height() {
+    return height_;
+  }
+  HWND getWd() {
+    return descriptor;
+  }
+  Window(HINSTANCE hInstance, int w = 1920, int h = 1080);
+  ~Window();
 };
-
-void showFPS(HDC hdc);

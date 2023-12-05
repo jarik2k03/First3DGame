@@ -1,77 +1,73 @@
 #include "Pyramid.h"
 
-#define H_WARNMSG(hr, text) if (FAILED(hr)) MessageBox( NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
+#define H_WARNMSG(hr, text) \
+  if (FAILED(hr))           \
+    MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
-Pyramid::Pyramid(ID3D11Device* i_d3dDevice, ID3D11DeviceContext* i_context, D3D_PRIMITIVE_TOPOLOGY drawMode)
-{
+Pyramid::Pyramid(ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode) : vShader(v), pShader(p) {
+	AdvVertex vertices[] =
+    {	/* координаты X, Y, Z				цвет R, G, B, A					 */
+        { XMFLOAT3(  0.0f,  1.5f,  0.0f ), XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
+        { XMFLOAT3( -1.0f,  0.0f, -1.0f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
+        { XMFLOAT3(  1.0f,  0.0f, -1.0f ), XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
+        { XMFLOAT3( -1.0f,  0.0f,  1.0f ), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
+        { XMFLOAT3(  1.0f,  0.0f,  1.0f ), XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) }
+    };
 
-	AdvVertex vertices[5] = {
-		{ XMFLOAT3(0.0f,  1.5f,  0.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f,  0.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f,  0.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f,  0.0f,  1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }
-	};
-	// пирамидка состоит из 6 треугольников =>  18 индексов вершин
-    WORD indices[18] = {	// индексы массива vertices[], по которым строятся треугольники
-        0,2,1,	/* Треугольник 1 = vertices[0], vertices[2], vertices[3] */
-        0,3,4,	/* Треугольник 2 = vertices[0], vertices[3], vertices[4] */
-        0,1,3,	/* и т. д. */
-        0,4,2,
-        1,2,3,
-        2,4,3, };
+  WORD indices[18] = {0, 2, 1, 0, 3, 4, 0, 1, 3, 0, 4, 2, 1, 2, 3, 2, 4, 3};
 
+  /* индексы массива vertices[], по которым строятся треугольники
+   *  0,2,1,	 Треугольник 1 = vertices[0], vertices[2], vertices[3]
+   *  0,3,4,	 Треугольник 2 = vertices[0], vertices[3], vertices[4]
+   *  0,1,3,	 и т. д.
+   *  0,4,2,
+   *  1,2,3,
+   *  2,4,3 */
 
-	D3D11_BUFFER_DESC bd;
-	D3D11_SUBRESOURCE_DATA bufData;
-	setBuffer(&bd, sizeof(AdvVertex) * 5, D3D11_BIND_VERTEX_BUFFER);
-	setBufferData(&bufData, vertices);
-	HRESULT hr = i_d3dDevice->CreateBuffer(&bd, &bufData, &vertexBuffer);
-	H_WARNMSG(hr, L"Ошибка инициализации вершинного буфера");
+  D3D11_BUFFER_DESC bd = setBufferDesc(sizeof(AdvVertex) * 5, D3D11_BIND_VERTEX_BUFFER);
+  D3D11_SUBRESOURCE_DATA srd = setResData(vertices);
+  HRESULT hr = Device::d3d->CreateBuffer(&bd, &srd, &vertexBuffer);
+  H_WARNMSG(hr, L"Ошибка инициализации вершинного буфера");
 
-	setBuffer(&bd, sizeof(WORD) * 18, D3D11_BIND_INDEX_BUFFER);
-	setBufferData(&bufData, indices);
-	hr = i_d3dDevice->CreateBuffer(&bd, &bufData, &indexBuffer);
-	H_WARNMSG(hr, L"Ошибка инициализации индексного буфера");
-	
-	unsigned int stride = sizeof(AdvVertex);
-	unsigned int offset = 0;
+  bd = setBufferDesc(sizeof(WORD) * 18, D3D11_BIND_INDEX_BUFFER);
+  srd = setResData(indices);
+  hr = Device::d3d->CreateBuffer(&bd, &srd, &indexBuffer);
+  H_WARNMSG(hr, L"Ошибка инициализации индексного буфера");
 
-	i_context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	i_context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-	i_context->IASetPrimitiveTopology(drawMode);
+  unsigned int stride = sizeof(AdvVertex);
+  unsigned int offset = 0;
 
-	setBuffer(&bd, sizeof(XMMATRIX) * 3, D3D11_BIND_CONSTANT_BUFFER);
-	hr = i_d3dDevice->CreateBuffer(&bd, NULL, &constBuffer);
-	H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
+  Device::ic->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+  Device::ic->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+  Device::ic->IASetPrimitiveTopology(drawMode);
+
+  bd = setBufferDesc(sizeof(XMMATRIX) * 3, D3D11_BIND_CONSTANT_BUFFER);
+  hr = Device::d3d->CreateBuffer(&bd, NULL, &constBuffer_);
+  H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
+
+  
 }
 
-void Pyramid::move(float x, float y, float z)
-{
-
+void Pyramid::render() {
+  Device::ic->VSSetShader(vShader, NULL, 0);
+  Device::ic->PSSetShader(pShader, NULL, 0);
+  Device::ic->VSSetConstantBuffers(0, 1, &constBuffer_); // загрузка буфера в шейдер
+  Device::ic->DrawIndexed(18, 0, 0);
 }
 
-
- void Pyramid::render(ID3D11DeviceContext* i_context)
-{
-	i_context->VSSetShader(vShader, NULL, 0);
-	i_context->PSSetShader(pShader, NULL, 0);
-	i_context->VSSetConstantBuffers(0, 1, &constBuffer); // загрузка буфера в шейдер
-	
-	i_context->DrawIndexed(18, 0, 0);
+D3D11_BUFFER_DESC Pyramid::setBufferDesc(int byteWidth, D3D11_BIND_FLAG bindBuffer, D3D11_USAGE usage) {
+  D3D11_BUFFER_DESC bd;
+  ZeroMemory(&bd, sizeof(bd));
+  bd.Usage = usage;
+  bd.ByteWidth = byteWidth;
+  bd.BindFlags = bindBuffer; // - тип буфера буфер вершин
+  bd.CPUAccessFlags = 0;
+  return bd;
 }
 
-void Pyramid::setBuffer(D3D11_BUFFER_DESC* bd, int byteWidth, D3D11_BIND_FLAG bindBuffer, D3D11_USAGE usage)
-{
-	ZeroMemory(bd, sizeof(*bd));
-	bd->Usage = usage;
-	bd->ByteWidth = byteWidth;
-	bd->BindFlags = bindBuffer; // - тип буфера буфер вершин
-	bd->CPUAccessFlags = 0;
-}
-
-void Pyramid::setBufferData(D3D11_SUBRESOURCE_DATA* o_bdata, void* w)
-{
-	ZeroMemory(o_bdata, sizeof(*o_bdata));
-	o_bdata->pSysMem = w;
+D3D11_SUBRESOURCE_DATA Pyramid::setResData(void* vert) {
+  D3D11_SUBRESOURCE_DATA bdata;
+  ZeroMemory(&bdata, sizeof(bdata));
+  bdata.pSysMem = vert;
+  return bdata;
 }

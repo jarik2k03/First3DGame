@@ -6,23 +6,12 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
-	
-	PAINTSTRUCT ps;
-	HDC hdc;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		showFPS(hdc);
-		EndPaint(hWnd, &ps);
-		break;
-
-
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-
 	switch (wParam) {
 	case VK_ESCAPE:
 		PostQuitMessage(0);
@@ -53,22 +42,16 @@ Window::Window(HINSTANCE hInstance, int w, int h )
 	RegisterClassEx(&wcex);
 
 	RECT rc = { 0, 0, w, h };	
-	width = rc.right - rc.left;
-	height = rc.bottom - rc.top;
+	width_ = rc.right - rc.left;
+	height_ = rc.bottom - rc.top;
 	AdjustWindowRect(&rc, WS_POPUPWINDOW, FALSE);
-	descriptor = CreateWindow(L"ÕÓ‚˚È ıÓÎÒÚ", L"œ¿“–»  »√–¿!", WS_POPUPWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, hInstance, nullptr);
+	descriptor = CreateWindow(L"ÕÓ‚˚È ıÓÎÒÚ", L"œ¿“–»  »√–¿!", WS_POPUPWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width_, height_, nullptr, nullptr, hInstance, nullptr);
 	ShowWindow(descriptor, 10);
+
 }
 
 Window::~Window() 
 {
 	DestroyWindow(descriptor);
-}
-
-void showFPS(HDC hdc)
-{
-	char caption[32] = "Current FPS: ";
-	sprintf_s(caption, 32, "FPS = %d", 60);
-	TextOutA(hdc, 16, 16, caption, strlen(caption));
 }
 

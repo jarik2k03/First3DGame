@@ -1,6 +1,6 @@
 #pragma once
-#include <d3d11.h>
-#include <d3dx11.h>
+#include <Rendering/Device.h>
+#include <_Commons/alias.h>
 #include <xnamath.h>
 #include <stdio.h>
 
@@ -14,9 +14,11 @@ class World
 {
 public:
 	World();
-	XMMATRIX* getWorldMatrix();
-	void UpdateMatrixes(ID3D11DeviceContext* i_context, XMMATRIX* view, XMMATRIX* perspective, ID3D11Buffer* cBuffer);
+	XMMATRIX& m_world();
+	void UpdateMatrixes(XMMATRIX& view, XMMATRIX& proj, ID3D11Buffer* cBuffer);
 protected:
-	XMMATRIX worldMatrix;
+	XMMATRIX m_world_;
+
+	void debug_matrixes(XMMATRIX& view, XMMATRIX& proj);
 };
 

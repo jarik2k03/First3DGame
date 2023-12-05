@@ -23,6 +23,7 @@
     <ClInclude Include="src\Entity\Pyramid.h" />
     <ClInclude Include="src\Entity\Sphera.h" />
     <ClInclude Include="src\Entity\Triangle.h" />
+    <ClInclude Include="src\_Commons\alias.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\icons\dx11.ico" />
@@ -32,5 +33,10 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Shaders\simple.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include=".gitattributes" />
+    <None Include=".clang-format" />
   </ItemGroup>
 </Project>

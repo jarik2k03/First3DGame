@@ -36,6 +36,8 @@ Device::Device(HWND wd) : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_D
       break;
   }
   H_WARNMSG(state, L"Не найдено подходящей версии драйвера Direct3d");
+
+  /* TargetView */
   ID3D11Texture2D* backBuffer;
   state = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
   H_WARNMSG(state, L"Не удалось получить буфер");
@@ -43,13 +45,25 @@ Device::Device(HWND wd) : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_D
   state = d3d->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView);
   H_WARNMSG(state, L"Не удалось задать задний буфер");
   backBuffer->Release();
-  // подключаем задний буфер к контексту устройства
-  ic->OMSetRenderTargets(1, &renderTargetView, nullptr);
+  /* STENCIL */
+  D3D11_TEXTURE2D_DESC depth = setDescDepth(width, height);
+  state = d3d->CreateTexture2D(&depth, NULL, &depth_stencil);
+  H_WARNMSG(state, L"Не удалось задать текстуру глубин");
+
+  D3D11_DEPTH_STENCIL_VIEW_DESC dsv = setDSV();
+  state = d3d->CreateDepthStencilView(depth_stencil, &dsv, &depth_stencil_view);
+  H_WARNMSG(state, L"Не создался буфер глубин");
+  ic->OMSetRenderTargets(1, &renderTargetView, depth_stencil_view);
+  /* ViewPort*/
   D3D11_VIEWPORT vp = setViewPort(width, height);
   ic->RSSetViewports(1, &vp); // привязываем к контексту устройства
 }
 
 void Device::release() {
+  if (depth_stencil)
+    depth_stencil->Release();
+  if (depth_stencil_view)
+    depth_stencil_view->Release();
   if (ic)
     ic->ClearState();
   if (renderTargetView)
@@ -93,10 +107,37 @@ DXGI_SWAP_CHAIN_DESC Device::setSwapChainDesc(
   return sc;
 }
 
-D3D11_VIEWPORT Device::setViewPort(float width, float height, float minDepth, float maxDepth, float topleftX, float topleftY) {
+D3D11_TEXTURE2D_DESC Device::setDescDepth(int width, int height, int interpolLev, D3D11_USAGE usage, DXGI_FORMAT pixelFormat) {
+  D3D11_TEXTURE2D_DESC depth;
+  ZeroMemory(&depth, sizeof(depth));
+  depth.Width = width;
+  depth.Height = height;
+  depth.MipLevels = interpolLev;
+  depth.ArraySize = 1;
+  depth.Format = pixelFormat;
+  depth.SampleDesc.Count = 1;
+  depth.SampleDesc.Quality = 0;
+  depth.Usage = usage;
+  depth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+  depth.CPUAccessFlags = 0;
+  depth.MiscFlags = 0;
+  return depth;
+
+}
+
+D3D11_DEPTH_STENCIL_VIEW_DESC Device::setDSV(D3D11_DSV_DIMENSION dimension, DXGI_FORMAT pixelFormat) {
+  D3D11_DEPTH_STENCIL_VIEW_DESC dsv;
+  ZeroMemory(&dsv, sizeof(dsv));
+  dsv.ViewDimension = dimension;
+  dsv.Format = pixelFormat;
+  dsv.Texture2D.MipSlice = 0;
+  return dsv;
+}
+
+D3D11_VIEWPORT Device::setViewPort(float w, float h, float minDepth, float maxDepth, float topleftX, float topleftY) {
   D3D11_VIEWPORT vp;
-  vp.Width = width;
-  vp.Height = height;
+  vp.Width = w;
+  vp.Height = h;
   vp.MinDepth = minDepth;
   vp.MaxDepth = maxDepth;
   vp.TopLeftX = topleftX;
@@ -108,6 +149,7 @@ void Device::renderStart() {
   // очищаем задний буфер
   float ClearColor[4] = {0.15f, 0.15f, 0.2f, 1.0f};
   ic->ClearRenderTargetView(renderTargetView, ClearColor);
+  ic->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH , 1.0f, 0);
   // выброс буфера на экран
 }
 

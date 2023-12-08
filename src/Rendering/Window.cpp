@@ -3,6 +3,9 @@
 #define H_ERRMSG(hr, text) if (FAILED(hr)){ MessageBox( NULL, text, L"Ошибка окна", MB_OK | MB_ICONHAND); exit(-1);}
 #define H_WARNMSG(hr, text) if (FAILED(hr)) MessageBox( NULL, text, L"Ошибка окна", MB_OK | MB_ICONEXCLAMATION);
 
+int Window::width_;
+int Window::height_;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
@@ -22,10 +25,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-Window::Window(HINSTANCE hInstance, int w, int h )
-{ 
-	
-	descriptor = NULL;
+Window::Window(HINSTANCE hInstance, int w, int h) : descriptor(NULL) { 
+    WNDCLASSEX wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = WndProc;

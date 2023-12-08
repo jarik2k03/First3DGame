@@ -1,7 +1,8 @@
 #include <Controllers/MsgHandler.h>
 #include <Entity/Camera.h>
-#include <Entity/Pyramid.h>
-#include <Entity/Triangle.h>
+#include <Figures/Pyramid.h>
+#include <Figures/Cube.h>
+#include <Figures/Triangle.h>
 #include <Rendering/Device.h>
 #include <Rendering/Shaders.h>
 #include <Rendering/Window.h>
@@ -15,14 +16,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   MsgHandler messenger;
   Shaders shaderController;
   World overlord;
-  Camera eye(window.width(), window.height(), XM_PIDIV4);
+  Camera eye(overlord.m_world(), XM_PIDIV4 / 1.5);
   ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
-
-  Pyramid piramidka(v, p);
-  entity_buflist cbuffers;
-  cbuffers.insert({"pyr", piramidka.constBuffer()});
-
+  Pyramid lipton(10, -1.5, 0, v, p);
+  Cube cubik(0, -1.5, 0, v, p);
+  
+  
 
   while (messenger.message() != WM_QUIT) {
     if (messenger.catched_message()) {
@@ -36,7 +36,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       if (!messenger.tick())
         goto render;
 
-      
       if (messenger.is_pressed('w')) {
         eye.move(0.0f, 0.0f, 0.22f);
       }
@@ -49,17 +48,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       if (messenger.is_pressed('d')) {
         eye.move(0.22f, 0.0f, 0.0f);
       }
-      if (messenger.is_pressed('u')) {
-        eye.rotate(-XM_PIDIV4 / 12);
+      if (messenger.is_pressed('+')) {
+        messenger.show_cursor(true);
       }
-      if (messenger.is_pressed('i')) {
-        eye.rotate(XM_PIDIV4 / 12);
+      if (messenger.is_pressed('-')) {
+        messenger.show_cursor(false);
       }
-      eye.fix_position(overlord.m_world(), cbuffers);
+
+      eye.rotate_x(messenger.get_cursor_dx());
+      eye.rotate_y(messenger.get_cursor_dy());
+      messenger.set_cursor_middle();
+
+      eye.fix_position(overlord.m_world(), lipton.constBuffer());
 
     render:
       directx.renderStart();
-      piramidka.render();
+      cubik.render();
+      lipton.render();
       directx.renderEnd();
     }
   }

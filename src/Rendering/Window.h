@@ -6,17 +6,12 @@
 class Window {
  private:
   HWND descriptor;
-  WNDCLASSEX wcex;
-  int width_;
-  int height_;
+
 
  public:
-  int width() {
-    return width_;
-  }
-  int height() {
-    return height_;
-  }
+  
+  static int width_;
+  static int height_;
   HWND getWd() {
     return descriptor;
   }

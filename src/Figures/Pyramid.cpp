@@ -4,28 +4,13 @@
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
-Pyramid::Pyramid(ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode) : vShader(v), pShader(p) {
-	AdvVertex vertices[] =
-    {	/* координаты X, Y, Z				цвет R, G, B, A					 */
-        { XMFLOAT3(  0.0f,  1.5f,  0.0f ), XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f,  0.0f, -1.0f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-        { XMFLOAT3(  1.0f,  0.0f, -1.0f ), XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f,  0.0f,  1.0f ), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
-        { XMFLOAT3(  1.0f,  0.0f,  1.0f ), XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) }
-    };
-
+Pyramid::Pyramid(const float x, const float y, const float z, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode)
+    : vShader(v), pShader(p) {
+  auto vertices = set_position(x, y, z);
   WORD indices[18] = {0, 2, 1, 0, 3, 4, 0, 1, 3, 0, 4, 2, 1, 2, 3, 2, 4, 3};
 
-  /* индексы массива vertices[], по которым строятся треугольники
-   *  0,2,1,	 Треугольник 1 = vertices[0], vertices[2], vertices[3]
-   *  0,3,4,	 Треугольник 2 = vertices[0], vertices[3], vertices[4]
-   *  0,1,3,	 и т. д.
-   *  0,4,2,
-   *  1,2,3,
-   *  2,4,3 */
-
-  D3D11_BUFFER_DESC bd = setBufferDesc(sizeof(AdvVertex) * 5, D3D11_BIND_VERTEX_BUFFER);
-  D3D11_SUBRESOURCE_DATA srd = setResData(vertices);
+  D3D11_BUFFER_DESC bd = setBufferDesc(sizeof(AdvVertex) * vertices.size(), D3D11_BIND_VERTEX_BUFFER);
+  D3D11_SUBRESOURCE_DATA srd = setResData(vertices.data());
   HRESULT hr = Device::d3d->CreateBuffer(&bd, &srd, &vertexBuffer);
   H_WARNMSG(hr, L"Ошибка инициализации вершинного буфера");
 
@@ -44,10 +29,18 @@ Pyramid::Pyramid(ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPO
   bd = setBufferDesc(sizeof(XMMATRIX) * 3, D3D11_BIND_CONSTANT_BUFFER);
   hr = Device::d3d->CreateBuffer(&bd, NULL, &constBuffer_);
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
-
-  
 }
 
+verts Pyramid::set_position(const float x, const float y, const float z) {
+  verts pyramidka(5);
+  pyramidka.at(0) = {XMFLOAT3(x, y, z), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)};
+  pyramidka.at(1) = {XMFLOAT3(x - 1, y - 1.5, z - 1), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
+  pyramidka.at(2) = {XMFLOAT3(x + 1, y - 1.5, z - 1), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)},
+  pyramidka.at(3) = {XMFLOAT3(x - 1, y - 1.5, z + 1), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},
+  pyramidka.at(4) = {XMFLOAT3(x + 1, y - 1.5, z + 1), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)};
+
+  return pyramidka;
+}
 void Pyramid::render() {
   Device::ic->VSSetShader(vShader, NULL, 0);
   Device::ic->PSSetShader(pShader, NULL, 0);

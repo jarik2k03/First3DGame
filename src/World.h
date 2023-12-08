@@ -1,6 +1,7 @@
 #pragma once
 #include <Rendering/Device.h>
 #include <_Commons/alias.h>
+#include <_Commons/vertex.h>
 #include <xnamath.h>
 #include <stdio.h>
 

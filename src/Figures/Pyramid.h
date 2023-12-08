@@ -1,16 +1,23 @@
 #pragma once
 #include <Rendering/Device.h>
+#include <_Commons/alias.h>
+#include <_Commons/vertex.h>
 #include <xnamath.h>
-struct AdvVertex {
-  XMFLOAT3 pos;
-  XMFLOAT4 color;
-};
+#include <vector>
+
+using verts = std::vector<AdvVertex>;
 
 class Pyramid {
  public:
-  Pyramid(ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  Pyramid(
+      const float x,
+      const float y,
+      const float z,
+      ID3D11VertexShader* v,
+      ID3D11PixelShader* p,
+      D3D_PRIMITIVE_TOPOLOGY drawMode = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   void render();
-
+  verts set_position(const float x, const float y, const float z);
   ID3D11Buffer* constBuffer() {
     return constBuffer_;
   }

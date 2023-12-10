@@ -15,3 +15,11 @@
 - DirectX библиотека, позволяющая взаимодействовать с матрицами и векторами, которые задают порядок перемещения и наблюдения в виртутальном мире.
 
 Проект создан и адаптирован для работы в Visual Studio.
+- [x] https://github.com/jarik2k03/First3DGame/issues/1
+- [x] https://github.com/jarik2k03/First3DGame/issues/2
+- [x] https://github.com/jarik2k03/First3DGame/issues/3
+- [x] https://github.com/jarik2k03/First3DGame/issues/4
+- [x] https://github.com/jarik2k03/First3DGame/issues/5
+- [x] https://github.com/jarik2k03/First3DGame/issues/6
+- [x] https://github.com/jarik2k03/First3DGame/issues/7
+- [ ] https://github.com/jarik2k03/First3DGame/issues/8

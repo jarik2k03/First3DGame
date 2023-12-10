@@ -10,22 +10,11 @@ struct TriangleVertices {
 class Triangle {
  public:
   Triangle(
-      ID3D11Device* i_d3dDevice,
-      ID3D11DeviceContext* i_context,
+      ID3D11VertexShader* v,
+      ID3D11PixelShader* p,
       TriangleVertices& i_firstCoords,
       D3D_PRIMITIVE_TOPOLOGY drawMode = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   void render(ID3D11DeviceContext* i_context);
-  void bindVShader(ID3D11VertexShader* v) {
-    vShader = v;
-  }
-  void bindPShader(ID3D11PixelShader* p) {
-    pShader = p;
-  }
-  void bindShaders(ID3D11VertexShader* v, ID3D11PixelShader* p) {
-    vShader = v;
-    pShader = p;
-  }
-  void move(float x, float y, float z);
 
  protected:
   ID3D11Buffer* vertexBuffer;

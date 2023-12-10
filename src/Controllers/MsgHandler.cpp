@@ -1,6 +1,5 @@
 #include "MsgHandler.h"
 
-
 MsgHandler::MsgHandler() {
   last_ticks = GetTickCount64();
   ZeroMemory(&message_, sizeof(message_));
@@ -11,27 +10,37 @@ MsgHandler::~MsgHandler() {
 }
 
 bool MsgHandler::catched_message() {
-  if (PeekMessage(&message_, NULL, 0, 0, PM_REMOVE)) {
+  while (PeekMessage(&message_, NULL, 0, 0, PM_REMOVE)) {
     TranslateMessage(&message_);
     DispatchMessage(&message_);
-    if (message_.message == WM_MOUSEMOVE) {
-      GetCursorPos(&cursor);
+    if (message_.message == WM_QUIT) {
+      catched_quit = true;
+      return true;
     }
+    for (int i = 0; i < 256; i++) {
+      keys[i] = GetAsyncKeyState(i);
+    }
+    GetCursorPos(&cursor);
     return true;
   }
   return false;
 }
 
-bool MsgHandler::is_pressed(Keys key) {
-  return message_.wParam != key ? false : true;
+bool MsgHandler::is_quit() {
+  return catched_quit;
 }
+
 
 bool MsgHandler::is_pressed(char keychar) {
-  return message_.wParam != keychar ? false : true;
+  return keys[(int)keychar];
 }
 
-void MsgHandler::show_cursor(bool value) {
-  ShowCursor(value);
+void MsgHandler::show_cursor() {
+  ShowCursor(true);
+}
+
+void MsgHandler::hide_cursor() {
+  ShowCursor(false);
 }
 
 int MsgHandler::get_cursor_dx() {
@@ -53,7 +62,7 @@ bool MsgHandler::move_event(char keychar) {
 bool MsgHandler::tick() {
   sstream ss;
   ss << "TICKS: " << GetTickCount64() - last_ticks << "\n";
-  CONSOLEDEBUG(ss);
+  //CONSOLEDEBUG(ss);
   DWORD current = GetTickCount64() - last_ticks;
   if (current > 12) {
     last_ticks = GetTickCount64();

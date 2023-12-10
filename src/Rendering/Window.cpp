@@ -5,6 +5,7 @@
 
 int Window::width_;
 int Window::height_;
+HWND Window::descriptor;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -25,7 +26,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-Window::Window(HINSTANCE hInstance, int w, int h) : descriptor(NULL) { 
+Window::Window(HINSTANCE hInstance, int w, int h) { 
     WNDCLASSEX wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;

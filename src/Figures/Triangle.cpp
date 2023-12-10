@@ -5,8 +5,8 @@
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
 Triangle::Triangle(
-    ID3D11Device* i_d3dDevice,
-    ID3D11DeviceContext* i_context,
+    ID3D11VertexShader* v,
+    ID3D11PixelShader* p,
     TriangleVertices& i_firstCoords,
     D3D_PRIMITIVE_TOPOLOGY drawMode) {
   coordinates = i_firstCoords;
@@ -18,15 +18,12 @@ Triangle::Triangle(
   setBuffer(&bd, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER);
   setBufferData(&bufData);
 
-  HRESULT hr = i_d3dDevice->CreateBuffer(&bd, &bufData, &vertexBuffer);
+  HRESULT hr = Device::d3d->CreateBuffer(&bd, &bufData, &vertexBuffer);
   H_WARNMSG(hr, L"Ошибка инициализации буфера");
   unsigned int stride = sizeof(XMFLOAT3);
   unsigned int offset = 0;
-  i_context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-  i_context->IASetPrimitiveTopology(drawMode);
-}
-
-void Triangle::move(float x, float y, float z) {
+  Device::ic->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+  Device::ic->IASetPrimitiveTopology(drawMode);
 }
 
 void Triangle::render(ID3D11DeviceContext* i_context) {

@@ -8,9 +8,9 @@
 ID3D11Device* Device::d3d;
 ID3D11DeviceContext* Device::ic;
 
-Device::Device(HWND wd) : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_DRIVER_TYPE_NULL), swapChain(NULL), renderTargetView(NULL) {
+Device::Device() : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_DRIVER_TYPE_NULL), swapChain(NULL), renderTargetView(NULL) {
   RECT rect;
-  GetClientRect(wd, &rect);
+  GetClientRect(Window::descriptor, &rect);
   int width = rect.right - rect.left; //+16;
   int height = rect.bottom - rect.top; //+39;
 
@@ -26,7 +26,7 @@ Device::Device(HWND wd) : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_D
   };
   // цепь связи
   DXGI_SWAP_CHAIN_DESC sc =
-      setSwapChainDesc(wd, 1, DXGI_USAGE_RENDER_TARGET_OUTPUT, width, height, true, 60, 1, DXGI_FORMAT_R8G8B8A8_UNORM);
+      setSwapChainDesc(Window::descriptor, 1, DXGI_USAGE_RENDER_TARGET_OUTPUT, width, height, true, 60, 1, DXGI_FORMAT_R8G8B8A8_UNORM);
   HRESULT state = S_OK;
   for (int driverIndex = 0; driverIndex < ARRAYSIZE(driverTypes); driverIndex++) {
     driverType = driverTypes[driverIndex];

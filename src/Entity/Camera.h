@@ -12,8 +12,7 @@ class Camera {
   Camera(XMMATRIX& in_world, FLOAT objectiveWidth);
   void fix_position(XMMATRIX& in_world, ID3D11Buffer* buffer);
   void move(const float dx, const float dy, const float dz);
-  void rotate_x(float anglex);
-  void rotate_y(float angley);
+  void rotate(int dx, int dy);
   XMMATRIX& m_view() {
     return m_view_;
   }
@@ -31,4 +30,6 @@ class Camera {
   float x, y, z;
   float rotation_anglex;
   float rotation_angley;
+  float radians_x;
+  float radians_y;
 };

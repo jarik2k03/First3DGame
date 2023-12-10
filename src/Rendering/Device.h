@@ -40,7 +40,7 @@ class Device {
  public:
   static ID3D11Device* d3d;
   static ID3D11DeviceContext* ic;
-  Device(HWND wd);
+  Device();
   ~Device();
 
   void renderStart();

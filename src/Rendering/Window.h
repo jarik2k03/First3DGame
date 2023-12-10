@@ -5,11 +5,11 @@
 
 class Window {
  private:
-  HWND descriptor;
+  
 
 
  public:
-  
+  static HWND descriptor;
   static int width_;
   static int height_;
   HWND getWd() {

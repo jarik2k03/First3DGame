@@ -12,19 +12,17 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
   Window window(hInstance, 1280, 720);
-  Device directx(window.getWd());
+  Device directx;
   MsgHandler messenger;
   Shaders shaderController;
   World overlord;
   Camera eye(overlord.m_world(), XM_PIDIV4 / 1.5);
   ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
-  Pyramid lipton(10, -1.5, 0, v, p);
   Cube cubik(0, -1.5, 0, v, p);
-  
-  
+  Pyramid lipton(10, -1.5, 15, v, p);
 
-  while (messenger.message() != WM_QUIT) {
+  while (messenger.is_quit()) {
     if (messenger.catched_message()) {
       if (messenger.is_pressed(Key_escape)) {
         exit(0);
@@ -36,29 +34,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       if (!messenger.tick())
         goto render;
 
-      if (messenger.is_pressed('w')) {
-        eye.move(0.0f, 0.0f, 0.22f);
+      if (messenger.is_pressed(VK_CONTROL)) {
+        messenger.show_cursor();  
+        goto matrixes;
       }
-      if (messenger.is_pressed('a')) {
-        eye.move(-0.22f, 0.0f, 0.0f);
-      }
-      if (messenger.is_pressed('s')) {
-        eye.move(0.0f, 0.0f, -0.22f);
-      }
-      if (messenger.is_pressed('d')) {
-        eye.move(0.22f, 0.0f, 0.0f);
-      }
-      if (messenger.is_pressed('+')) {
-        messenger.show_cursor(true);
-      }
-      if (messenger.is_pressed('-')) {
-        messenger.show_cursor(false);
-      }
-
-      eye.rotate_x(messenger.get_cursor_dx());
-      eye.rotate_y(messenger.get_cursor_dy());
+      
+      messenger.hide_cursor();  
       messenger.set_cursor_middle();
+      if (messenger.is_pressed('W')) {
+        eye.move(0.0f, 0.0f, 1.0f);
+      }
+      if (messenger.is_pressed('A')) {
+        eye.move(-1.0f, 0.0f, 0.0f);
+      }
+      if (messenger.is_pressed('S')) {
+        eye.move(0.0f, 0.0f, -1.0f);
+      }
+      if (messenger.is_pressed('D')) {
+        eye.move(1.0f, 0.0f, 0.0f);
+      }
+      eye.rotate(messenger.get_cursor_dx() * 10, messenger.get_cursor_dy() * 10);
 
+    matrixes:
       eye.fix_position(overlord.m_world(), lipton.constBuffer());
 
     render:

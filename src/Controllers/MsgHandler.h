@@ -12,8 +12,8 @@ enum Keys
 
 class MsgHandler {
  private:
-  HHOOK mouse_hook;
-  
+  SHORT keys[256];
+  bool catched_quit;
   Keys keyboard_buttons;
   DWORD last_ticks;
 
@@ -25,13 +25,17 @@ class MsgHandler {
   MsgHandler();
   ~MsgHandler();
   bool catched_message();
-  bool is_pressed(Keys key);
+
   bool is_pressed(char keychar);
   int get_cursor_dx();
   int get_cursor_dy();
   bool move_event(char keychar);
-  void show_cursor(bool value);
+  bool is_quit();
+  
+  void show_cursor();
+  void hide_cursor();
   void set_cursor_middle();
+  
   bool tick();
 
   UINT wParam() const {

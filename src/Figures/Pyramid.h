@@ -17,7 +17,8 @@ class Pyramid {
       ID3D11PixelShader* p,
       D3D_PRIMITIVE_TOPOLOGY drawMode = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   void render();
-  verts set_position(const float x, const float y, const float z);
+  verts init_position(const float x, const float y, const float z);
+  void update_state(XMMATRIX& view, XMMATRIX& proj);
   ID3D11Buffer* constBuffer() {
     return constBuffer_;
   }
@@ -28,7 +29,7 @@ class Pyramid {
   ID3D11Buffer* constBuffer_;
   ID3D11VertexShader* vShader;
   ID3D11PixelShader* pShader;
-
+  XMMATRIX location_;
   D3D11_SUBRESOURCE_DATA setResData(void* vert);
   D3D11_BUFFER_DESC setBufferDesc(int byteWidth, D3D11_BIND_FLAG bindBuffer, D3D11_USAGE usage = D3D11_USAGE_DEFAULT);
 };

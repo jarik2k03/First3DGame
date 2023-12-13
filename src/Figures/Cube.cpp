@@ -4,9 +4,9 @@
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
-Cube::Cube(const float x, const float y, const float z, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode)
-    : vShader(v), pShader(p) {
-  auto vertices = set_position(x, y, z);
+Cube::Cube(const position& xyz, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode)
+    : vShader(v), pShader(p), pos(xyz) {
+  auto vertices = init_position(pos.x, pos.y, pos.z);
   WORD indices[36] = {
       1, 0, 2, 
       0, 1, 4, 
@@ -20,7 +20,7 @@ Cube::Cube(const float x, const float y, const float z, ID3D11VertexShader* v, I
       4, 5, 6, 
       2, 6, 7, 
       3, 2, 7};
-
+  
   D3D11_BUFFER_DESC bd = setBufferDesc(sizeof(AdvVertex) * vertices.size(), D3D11_BIND_VERTEX_BUFFER);
   D3D11_SUBRESOURCE_DATA srd = setResData(vertices.data());
   HRESULT hr = Device::d3d->CreateBuffer(&bd, &srd, &vertexBuffer);
@@ -43,7 +43,7 @@ Cube::Cube(const float x, const float y, const float z, ID3D11VertexShader* v, I
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
 }
 
-verts Cube::set_position(const float x, const float y, const float z) {
+verts Cube::init_position(const float x, const float y, const float z) {
   verts cubick(8);
   cubick.at(0) = {XMFLOAT3(x, y, z), XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f)};
   cubick.at(1) = {XMFLOAT3(x + 2, y, z), XMFLOAT4(0.6f, 0.6f, 0.6f, 0.6f)},
@@ -53,12 +53,24 @@ verts Cube::set_position(const float x, const float y, const float z) {
   cubick.at(5) = {XMFLOAT3(x + 2, y - 2, z), XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)};
   cubick.at(6) = {XMFLOAT3(x, y - 2, z + 2), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f)};
   cubick.at(7) = {XMFLOAT3(x + 2, y - 2, z + 2), XMFLOAT4(0.4f, 0.4f, 0.4f, 0.4f)};
+  location_ = XMMatrixTranslation(x, y, z);
   return cubick;
 }
+
+void Cube::update_state(XMMATRIX& view, XMMATRIX& proj) {
+  ConstantBuffer cb;
+  cb.world = XMMatrixTranspose(location_);
+  cb.view = XMMatrixTranspose(view);
+  cb.proj = XMMatrixTranspose(proj);
+  Device::ic->UpdateSubresource(constBuffer_, 0, NULL, &cb, 0, 0);
+
+}
+
 void Cube::render() {
   Device::ic->VSSetShader(vShader, NULL, 0);
   Device::ic->PSSetShader(pShader, NULL, 0);
   Device::ic->VSSetConstantBuffers(0, 1, &constBuffer_); // загрузка буфера в шейдер
+  Device::ic->PSSetConstantBuffers(0, 1, &constBuffer_); // загрузка буфера в шейдер
   Device::ic->DrawIndexed(36, 0, 0);
 }
 

@@ -20,6 +20,9 @@ struct AdvVertex {
   XMFLOAT4 color;
 };
 
+struct position {
+  float x, y, z;
+};
 
 static void debug_matrixes(XMMATRIX& world, XMMATRIX& view, XMMATRIX& proj) {
   std::stringstream ss;

@@ -1,49 +1,32 @@
 #include "Camera.h"
+#include <algorithm>
 
-Camera::Camera(XMMATRIX& in_world, FLOAT objectiveWidth)
-    : fov(objectiveWidth), rotation_anglex(0.0f), rotation_angley(0.0f), m_world(in_world) {
-  x = 0.0f, y = 1.0f, z = -55.0f;
-  FXMVECTOR eye = XMVectorSet(x, y, z, 0);
-  FXMVECTOR rotation = XMVectorSet(0, 1, 0, 0);
-  FXMVECTOR pitch = XMVectorSet(0, 1, 0, 0);
+Camera::Camera(float FOV, const position& xyz)
+    : fov(FOV), mx(0), my(0), pos(xyz){
+  move(pos.x, pos.y ,pos.z);
+  restrict_x = static_cast<int>(static_cast<float>(Window::height_) * XM_2PI);
+  restrict_y = static_cast<int>(static_cast<float>(Window::height_) * 1.5 * XM_PIDIV4);
 
-  m_view_ = XMMatrixLookAtLH(eye, rotation, pitch); // LH наша координатная система
-  m_proj_ = XMMatrixPerspectiveFovLH(objectiveWidth, Window::width_ / (float)Window::height_, 0.01f, 100.0f);
+  m_proj_ = XMMatrixPerspectiveFovLH(FOV, Window::width_ / (float)Window::height_, 0.01f, 100.0f);
   // 3 аргумент - самое ближнее видимое расстояние, 4 аргумент - самое дальнее
 }
 
-void Camera::fix_position(XMMATRIX& in_world, ID3D11Buffer* buffer) {
-  ConstantBuffer bd;
-  bd.world = XMMatrixTranspose(in_world);
-  bd.view = XMMatrixTranspose(m_view_);
-  bd.proj = XMMatrixTranspose(m_proj_);
-
-  debug_matrixes(in_world, m_view_, m_proj_);
-  // загружаем структуру bd в константный буфер
-  Device::ic->UpdateSubresource(buffer, 0, NULL, &bd, 0, 0);
-}
 
 void Camera::rotate(int dx, int dy) {
+  mx -= dx, my -= dy;  
+  my = std::clamp(my, -restrict_y, restrict_y);
+  mx %= restrict_x;
 
-  float radians_dx = (float)dx / Window::height_;
-  float radians_dy = (float)dy / Window::height_;
-  radians_x += radians_dx;
-  radians_y -= radians_dy;
-
-  XMVECTOR eye = XMVectorSet(x, y, z, 0);
-  XMVECTOR rotation = XMVectorSet(radians_x, radians_y, 0, 1);
-  XMVECTOR pitch = XMVectorSet(0, 1, 0, 0);
-
-  m_view_ = XMMatrixLookAtLH(eye, rotation, pitch); // LH наша координатная система
+  float radians_x = (float)mx / Window::height_;
+  float radians_y = (float)my / Window::height_;
+  
+  auto r = XMMatrixRotationY(radians_x) * XMMatrixRotationX(radians_y);
+  m_view_ = XMMatrixTranslation(pos.x, pos.y, pos.z) * r;
 }
 
+
 void Camera::move(const float dx, const float dy, const float dz) {
-  x += dx, y += dy, z += dz;
-  FXMVECTOR eye = XMVectorSet(0, 0, 0, 1);
-  FXMVECTOR rotation = XMVectorSet(0, 0, 0, 1);
-  FXMVECTOR pitch = XMVectorSet(0, 1, 0, 1);
-  m_view_ = XMMatrixLookAtLH(eye, rotation, pitch); // LH наша координатная система
-  m_view_(3, 0) = x;
-  m_view_(3, 1) = y;
-  m_view_(3, 2) = z;
+  pos.x += dx, pos.y += dy, pos.z += dz;
+  XMMATRIX translated = XMMatrixTranslation(dx, dy, dz);
+  m_view_ *= translated;
 }

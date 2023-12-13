@@ -25,10 +25,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
   while (!messenger.is_quit()) {
     if (messenger.catched_message()) {
-      if (messenger.is_pressed(Key_escape)) {
+      if (messenger.is_pressed(VK_ESCAPE)) {
         exit(0);
       }
-      if (messenger.is_pressed(Key_f11)) {
+      if (messenger.is_pressed(VK_F11)) {
         directx.switchFullScreen();
       }
     } else {

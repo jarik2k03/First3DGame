@@ -1,5 +1,6 @@
 
 Texture2D dirt : register(t0);
+SamplerState sample_linear_mip : register(s0);
 
 cbuffer ConstantBuffer : register (b0) // b0 - индекс буфера
 {
@@ -8,23 +9,26 @@ cbuffer ConstantBuffer : register (b0) // b0 - индекс буфера
 	matrix proj;
 }
 
-struct VS_OUTPUT {
-	float4 pos : SV_POSITION;
-	float2 coords : TEXCOORD0;
+struct VS_INPUT {
+	float4 pos : POSITION;
+	float2 tex : TEXCOORD0;
 };
 
-VS_OUTPUT VS_Out(float4 pos : POSITION, float2 coord : TEXCOORD)
+struct PS_OUTPUT // Входящие данные пиксельного шейдера
 {
-	VS_OUTPUT output = (VS_OUTPUT)0; // создали нашу структуру
-	output.pos = mul(pos, world); // трансформация позиции вершины в матрицу мира
+  float4 pos : SV_POSITION; // Позиция пикселя в проекции (экранная)
+  float2 tex : TEXCOORD0; // Координаты текстуры по tu, tv
+};
+
+PS_OUTPUT VS_Out(VS_INPUT input) {
+	PS_OUTPUT output = (PS_OUTPUT)0; // создали нашу структуру
+	output.pos = mul(input.pos, world); // трансформация позиции вершины в матрицу мира
 	output.pos = mul(output.pos, view); // в матрицу вида
 	output.pos = mul(output.pos, proj); // в матрицу проекции
-	output.coords = coord;
-	// Оставляем координаты точки без изменений
+	output.tex = input.tex;
 	return output;
 }
 
-float2 PS_Out(VS_OUTPUT input) : SV_Target
-{
-	return input.coords;
+float4 PS_Out(PS_OUTPUT input) : SV_Target {
+  return dirt.Sample(sample_linear_mip, input.tex);
 }

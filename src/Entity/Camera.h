@@ -3,14 +3,13 @@
 #include <_Commons/alias.h>
 #include <_Commons/vertex.h>
 #include <xnamath.h>
-#include <unordered_map>
 
 class Camera {
  public:
   Camera(float FOV, const position& xyz);
   void move(const position& offset);
-  void move_side(float speed);
-  void move_straight(float speed);
+  void move_side(const float speed);
+  void move_straight(const float speed);
   void rotate(int dx, int dy);
   XMMATRIX& m_view() {
     return m_view_;

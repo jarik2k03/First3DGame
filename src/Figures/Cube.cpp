@@ -45,14 +45,14 @@ Cube::Cube(const position& xyz, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D
 
 verts Cube::init_position(const float x, const float y, const float z) {
   verts cubick(8);
-  cubick.at(0) = {XMFLOAT3(x, y, z), XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f)};
-  cubick.at(1) = {XMFLOAT3(x + 2, y, z), XMFLOAT4(0.6f, 0.6f, 0.6f, 0.6f)},
-  cubick.at(2) = {XMFLOAT3(x, y, z + 2), XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f)},
-  cubick.at(3) = {XMFLOAT3(x + 2, y, z + 2), XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f)},
-  cubick.at(4) = {XMFLOAT3(x, y - 2, z), XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f)};
-  cubick.at(5) = {XMFLOAT3(x + 2, y - 2, z), XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f)};
-  cubick.at(6) = {XMFLOAT3(x, y - 2, z + 2), XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f)};
-  cubick.at(7) = {XMFLOAT3(x + 2, y - 2, z + 2), XMFLOAT4(0.4f, 0.4f, 0.4f, 0.4f)};
+  cubick.at(0) = {XMFLOAT3(x, y, z), XMFLOAT2(0.5f, 0.5f)};
+  cubick.at(1) = {XMFLOAT3(x + 2, y, z), XMFLOAT2(0.6f, 0.6f)},
+  cubick.at(2) = {XMFLOAT3(x, y, z + 2), XMFLOAT2(0.7f, 0.7f)},
+  cubick.at(3) = {XMFLOAT3(x + 2, y, z + 2), XMFLOAT2(0.8f, 0.8f)},
+  cubick.at(4) = {XMFLOAT3(x, y - 2, z), XMFLOAT2(0.1f, 0.1f)};
+  cubick.at(5) = {XMFLOAT3(x + 2, y - 2, z), XMFLOAT2(0.2f, 0.2f)};
+  cubick.at(6) = {XMFLOAT3(x, y - 2, z + 2), XMFLOAT2(0.3f, 0.3f)};
+  cubick.at(7) = {XMFLOAT3(x + 2, y - 2, z + 2), XMFLOAT2(0.4f, 0.4f)};
   location_ = XMMatrixTranslation(x, y, z);
   return cubick;
 }

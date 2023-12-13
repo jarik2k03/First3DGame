@@ -27,7 +27,7 @@ ID3D11VertexShader* Shaders::addVertexShader(stlcwstr& filename, stlcstr& entryP
   int offset = 0;
   D3D11_INPUT_ELEMENT_DESC layout[2] = {
       {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-      {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}};
+      {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}};
   // создали макет вершин vertexLayout
   ID3D11InputLayout* vLayout;
   hr = Device::d3d->CreateInputLayout(layout, ARRAYSIZE(layout), curBlob->GetBufferPointer(), curBlob->GetBufferSize(), &vLayout);

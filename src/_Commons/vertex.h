@@ -17,7 +17,7 @@ struct ConstantBuffer {
 
 struct AdvVertex {
   XMFLOAT3 pos;
-  XMFLOAT4 color;
+  XMFLOAT2 texture;
 };
 
 struct position {

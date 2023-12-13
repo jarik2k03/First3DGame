@@ -8,7 +8,9 @@
 class Camera {
  public:
   Camera(float FOV, const position& xyz);
-  void move(const float dx, const float dy, const float dz);
+  void move(const position& offset);
+  void move_side(float speed);
+  void move_straight(float speed);
   void rotate(int dx, int dy);
   XMMATRIX& m_view() {
     return m_view_;
@@ -20,14 +22,8 @@ class Camera {
  protected:
   XMMATRIX m_view_;
   XMMATRIX m_proj_;
-  XMMATRIX m_world_;
-
   position pos;
-  int restrict_x;
-  int restrict_y;
-  int mx, my;
-  
-  float radians_x;
-  float radians_y;
+  int restrict_x, restrict_y;
+  int mouse_x, mouse_y;
   float fov;
 };

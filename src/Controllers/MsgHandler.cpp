@@ -1,6 +1,6 @@
 #include "MsgHandler.h"
 
-MsgHandler::MsgHandler() {
+MsgHandler::MsgHandler() : catched_quit(false){
   last_ticks = GetTickCount64();
   ZeroMemory(&message_, sizeof(message_));
   middle_cursor = {Window::width_ >> 1, Window::height_ >> 1};

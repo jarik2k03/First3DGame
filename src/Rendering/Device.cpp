@@ -147,7 +147,7 @@ D3D11_VIEWPORT Device::setViewPort(float w, float h, float minDepth, float maxDe
 
 void Device::renderStart() {
   // очищаем задний буфер
-  float ClearColor[4] = {0.15f, 0.15f, 0.2f, 1.0f};
+  float ClearColor[4] = {0.722, 0.831, 0.851, 0.859};
   ic->ClearRenderTargetView(renderTargetView, ClearColor);
   ic->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH , 1.0f, 0);
   // выброс буфера на экран

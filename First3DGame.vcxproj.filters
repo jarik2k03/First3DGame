@@ -8,7 +8,6 @@
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\Entity\Camera.cpp" />
     <ClCompile Include="src\Figures\Pyramid.cpp" />
-    <ClCompile Include="src\Entity\Sphera.cpp" />
     <ClCompile Include="src\Figures\Triangle.cpp" />
     <ClCompile Include="src\Controllers\MsgHandler.cpp" />
     <ClCompile Include="src\Figures\Cube.cpp" />
@@ -23,7 +22,6 @@
     <ClInclude Include="src\Entity\AbstractFigure.h" />
     <ClInclude Include="src\Entity\Camera.h" />
     <ClInclude Include="src\Figures\Pyramid.h" />
-    <ClInclude Include="src\Entity\Sphera.h" />
     <ClInclude Include="src\Figures\Triangle.h" />
     <ClInclude Include="src\_Commons\alias.h" />
     <ClInclude Include="src\Controllers\MsgHandler.h" />

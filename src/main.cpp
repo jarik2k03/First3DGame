@@ -17,14 +17,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   MsgHandler messenger;
   Shaders shaderController;
   World overlord;
-  Camera eye(XM_PIDIV4 / 1.5, {0, 0, 0});
+  Camera eye(XM_PIDIV4 / 1.5, {-10, 0, -20});
   ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
-  //Pyramid lipton(10, -1.5, 15, v, p); Deprecated.
   Cube cubik({10, -1.5, 25}, v, p);
   Cube cubb({10, -4.5, 35}, v, p);
 
-  while (messenger.is_quit()) {
+  while (!messenger.is_quit()) {
     if (messenger.catched_message()) {
       if (messenger.is_pressed(Key_escape)) {
         exit(0);
@@ -43,31 +42,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
       messenger.hide_cursor();
       messenger.set_cursor_middle();
+
       if (messenger.is_pressed('W')) {
-        eye.move(0.0f, 0.0f, -0.4f);
-      }
-      if (messenger.is_pressed('A')) {
-        eye.move(0.3f, 0.0f, 0.0f);
+        eye.move_straight(0.4f);
       }
       if (messenger.is_pressed('S')) {
-        eye.move(0.0f, 0.0f, 0.2f);
+        eye.move_straight(-0.2f);
+      }
+      if (messenger.is_pressed('A')) {
+        eye.move_side(-0.3f);
       }
       if (messenger.is_pressed('D')) {
-        eye.move(-0.3f, 0.0f, 0.0f);
+        eye.move_side(0.3f);
       }
+      if (messenger.is_pressed(VK_SPACE)) {
+        eye.move({0.0f, 0.3f, 0.0f});
+      }
+      if (messenger.is_pressed(VK_SHIFT)) {
+        eye.move({0.0f, -0.3f, 0.0f});
+      }
+
       eye.rotate(messenger.get_cursor_dx(), messenger.get_cursor_dy());
-      if (messenger.is_pressed(VK_LEFT)) {
-        eye.rotate(-5, 0);
-      }
-      if (messenger.is_pressed(VK_RIGHT)) {
-        eye.rotate(5, 0);
-      }
-      if (messenger.is_pressed(VK_UP)) {
-        eye.rotate(0, -5);
-      }
-      if (messenger.is_pressed(VK_DOWN)) {
-        eye.rotate(0, 5);
-      }
 
     matrixes:
       cubik.update_state(eye.m_view(), eye.m_proj());

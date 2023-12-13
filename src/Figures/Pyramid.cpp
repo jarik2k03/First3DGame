@@ -36,11 +36,11 @@ Pyramid::Pyramid(const float x, const float y, const float z, ID3D11VertexShader
 
 verts Pyramid::init_position(const float x, const float y, const float z) {
   verts pyramidka(5);
-  pyramidka.at(0) = {XMFLOAT3(x, y, z), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)};
-  pyramidka.at(1) = {XMFLOAT3(x - 1, y - 1.5, z - 1), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
-  pyramidka.at(2) = {XMFLOAT3(x + 1, y - 1.5, z - 1), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)},
-  pyramidka.at(3) = {XMFLOAT3(x - 1, y - 1.5, z + 1), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f)},
-  pyramidka.at(4) = {XMFLOAT3(x + 1, y - 1.5, z + 1), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)};
+  pyramidka.at(0) = {XMFLOAT3(x, y, z), XMFLOAT2(1.0f, 1.0f)};
+  pyramidka.at(1) = {XMFLOAT3(x - 1, y - 1.5, z - 1), XMFLOAT2(0.0f, 1.0f)},
+  pyramidka.at(2) = {XMFLOAT3(x + 1, y - 1.5, z - 1), XMFLOAT2(0.0f, 0.0f)},
+  pyramidka.at(3) = {XMFLOAT3(x - 1, y - 1.5, z + 1), XMFLOAT2(0.0f, 1.0f)},
+  pyramidka.at(4) = {XMFLOAT3(x + 1, y - 1.5, z + 1), XMFLOAT2(1.0f, 0.0f)};
   location_ = XMMatrixTranslation(x, y, z);
 
   return pyramidka;

@@ -9,6 +9,8 @@ void Modeler::create_model(stlcwstr& name) {
   model_buffer main_buffer;
   auto vertices = init_position();
   auto indices = init_indexed();
+  
+  main_buffer.idx_len = indices.size();
 
   auto bd = set_buffer_desc(sizeof(AdvVertex) * vertices.size(), D3D11_BIND_VERTEX_BUFFER);
   D3D11_SUBRESOURCE_DATA srd = set_res_data(vertices.data());
@@ -32,7 +34,7 @@ void Modeler::create_model(stlcwstr& name) {
 model_buffer Modeler::get_model(stlcwstr& name) const {
   auto it = saved_models.find(name);
   if (it == saved_models.end())
-    std::runtime_error("Текстура для загрузки не найдена!");
+    std::runtime_error err("Текстура для загрузки не найдена!");
   return it->second;
 }
 
@@ -80,9 +82,6 @@ D3D11_SUBRESOURCE_DATA Modeler::set_res_data(void* vert) {
   bdata.pSysMem = vert;
   return bdata;
 }
-
-
-
 
 vertices init_position() {
   vertices cubick(24);

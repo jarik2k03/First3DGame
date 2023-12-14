@@ -3,7 +3,6 @@
 #include <_Commons/alias.h>
 #include <_Commons/vertex.h>
 #include <Rendering/Modeler.hh>
-#include <xnamath.h>
 
 class Cube {
  public:
@@ -17,6 +16,7 @@ class Cube {
 
  protected:
   XMFLOAT3 pos;
+  WORD n_indices;
   ID3D11Buffer* vertex_buf_;
   ID3D11Buffer* index_buf_;
   ID3D11Buffer* const_buf_;

@@ -19,6 +19,7 @@ struct model_buffer {
   ID3D11Buffer* index;
   ID3D11SamplerState* sample;
   ID3D11ShaderResourceView* texture;
+  WORD idx_len;
 };
 using model_buffers = std::unordered_map<stlwstr, model_buffer>;
 

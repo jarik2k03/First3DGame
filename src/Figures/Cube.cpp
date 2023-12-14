@@ -7,6 +7,7 @@
 Cube::Cube(const XMFLOAT3& xyz, const model_buffer& b, ID3D11VertexShader* v, ID3D11PixelShader* p)
     : vShader(v),
       pShader(p),
+      n_indices(b.idx_len),
       pos{-xyz.x, -xyz.y, -xyz.z},
       vertex_buf_(b.vertex),
       index_buf_(b.index),
@@ -54,5 +55,5 @@ void Cube::render() {
   Device::ic->PSSetShaderResources(0, 1, &textureSRV);
   Device::ic->PSSetSamplers(0, 1, &sampler_buf_);
   // готовый результат отобразится на экране
-  Device::ic->DrawIndexed(36, 0, 0);
+  Device::ic->DrawIndexed(n_indices, 0, 0);
 }

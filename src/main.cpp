@@ -4,7 +4,7 @@
 #include <Figures/Pyramid.h>
 #include <Figures/Triangle.h>
 #include <Rendering/Device.h>
-#include <Rendering/Shaders.h>
+#include <Controllers/Shaders.h>
 #include <Rendering/Window.h>
 #include <World.h>
 
@@ -17,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   MsgHandler messenger;
   Shaders shaderController;
   World overlord;
-  Camera eye(XM_PIDIV4 / 1.5, {10, 0, 20});
+  Camera eye(110.0f, {10, 0, 20});
   ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
   Cube cubik({20, 0, 20}, v, p);

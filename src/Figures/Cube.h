@@ -4,27 +4,30 @@
 #include <_Commons/vertex.h>
 #include <xnamath.h>
 #include <vector>
+#include <array>
 
-using verts = std::vector<AdvVertex>;
-using indices = std::vector<WORD>;
+using vertices = std::array<AdvVertex, 24>;
+using indices = std::array<WORD, 36>;
+
+vertices init_position();
+indices init_indexed();
 
 class Cube {
  public:
   Cube(
-      const position& xyz,
+      const XMFLOAT3& xyz,
       ID3D11VertexShader* v,
       ID3D11PixelShader* p,
       D3D_PRIMITIVE_TOPOLOGY drawMode = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   void update_state(XMMATRIX& view, XMMATRIX& proj);
   void render();
-  verts init_position(const float x, const float y, const float z);
-  indices init_indexed();
+
   ID3D11Buffer* constBuffer() {
     return constBuffer_;
   }
 
  protected:
-  position pos;
+  XMFLOAT3 pos;
   ID3D11Buffer* vertexBuffer;
   ID3D11Buffer* indexBuffer;
   ID3D11Buffer* constBuffer_;

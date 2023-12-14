@@ -7,7 +7,10 @@
 
 #define CONSOLEDEBUG(ss) OutputDebugStringA(ss.str().c_str());
 
-
+#define X0 0.0f
+#define X1 1.0f
+#define Z0 0.0f
+#define Z1 1.0f
 
 struct ConstantBuffer {
   XMMATRIX world;

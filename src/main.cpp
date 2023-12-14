@@ -12,16 +12,16 @@
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-  Window window(hInstance, 1920, 1080);
+  Window window(hInstance, 1280, 720);
   Device directx;
   MsgHandler messenger;
   Shaders shaderController;
   World overlord;
-  Camera eye(XM_PIDIV4 / 1.5, {-10, 0, -20});
+  Camera eye(XM_PIDIV4 / 1.5, {10, 0, 20});
   ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
-  Cube cubik({10, -1.5, 25}, v, p);
-  Cube cubb({10, -4.5, 35}, v, p);
+  Cube cubik({20, 0, 20}, v, p);
+  Cube cubb({0, 0, -10}, v, p);
 
   while (!messenger.is_quit()) {
     if (messenger.catched_message()) {

@@ -5,7 +5,7 @@
 Camera::Camera(float FOV, const position& xyz) : fov(FOV), mouse_x(0), mouse_y(0), pos(xyz) {
   move({pos.x, pos.y, pos.z});
   restrict_x = static_cast<int>(static_cast<float>(Window::height_) * XM_2PI);
-  restrict_y = static_cast<int>(static_cast<float>(Window::height_) * 1.5 * XM_PIDIV4);
+  restrict_y = static_cast<int>(static_cast<float>(Window::height_) * 2 * XM_PIDIV4);
 
   m_proj_ = XMMatrixPerspectiveFovLH(FOV, Window::width_ / (float)Window::height_, 0.01f, 100.0f);
   // 3 аргумент - самое ближнее видимое расстояние, 4 аргумент - самое дальнее
@@ -32,6 +32,10 @@ void Camera::move_side(const float speed) {
   pos.z -= calc_dx; // calc_dx;
   pos.x -= calc_dz; // calc_dz;
   m_view_ *= XMMatrixTranslation(-calc_dz, 0, -calc_dx);
+
+    sstream ss;
+  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
+  CONSOLEDEBUG(ss);
 }
 
 void Camera::move_straight(const float speed) {
@@ -43,9 +47,17 @@ void Camera::move_straight(const float speed) {
   pos.z -= calc_dz; // calc_dx;
   pos.x += calc_dx; // calc_dz;
   m_view_ *= XMMatrixTranslation(calc_dx, 0, -calc_dz);
+
+    sstream ss;
+  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
+  CONSOLEDEBUG(ss);
 }
 
 void Camera::move(const position& offset) {
   pos.x -= offset.x, pos.y -= offset.y, pos.z -= offset.z;
   m_view_ *= XMMatrixTranslation(offset.x, offset.y, offset.z);
+
+  sstream ss;
+  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
+  CONSOLEDEBUG(ss);
 }

@@ -5,7 +5,7 @@
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
 Cube::Cube(const position& xyz, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D_PRIMITIVE_TOPOLOGY drawMode)
-    : vShader(v), pShader(p), pos(xyz) {
+    : vShader(v), pShader(p), pos{-xyz.x, -xyz.y, -xyz.z} {
   auto vertices = init_position(pos.x, pos.y, pos.z);
   auto indices = init_indexed();
 
@@ -38,43 +38,53 @@ Cube::Cube(const position& xyz, ID3D11VertexShader* v, ID3D11PixelShader* p, D3D
 }
 
 verts Cube::init_position(const float x, const float y, const float z) {
+  sstream ss;
+  ss << "x: " << x << " y: " << y << " z: " << z << '\n';
+  CONSOLEDEBUG(ss);
   verts cubick(24);
-  cubick.at(0) = {XMFLOAT3(x - 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(1) = {XMFLOAT3(x + 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(2) = {XMFLOAT3(x + 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(3) = {XMFLOAT3(x - 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(0.0f, 1.0f)};
-
-  cubick.at(4) = {XMFLOAT3(x - 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(5) = {XMFLOAT3(x + 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(6) = {XMFLOAT3(x + 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(7) = {XMFLOAT3(x - 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(0.0f, 1.0f)};
-
-  cubick.at(8) = {XMFLOAT3(x - 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(9) = {XMFLOAT3(x - 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(10) = {XMFLOAT3(x - 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(11) = {XMFLOAT3(x - 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(0.0f, 1.0f)};
-
-  cubick.at(12) = {XMFLOAT3(x + 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(13) = {XMFLOAT3(x + 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(14) = {XMFLOAT3(x + 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(15) = {XMFLOAT3(x + 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(0.0f, 1.0f)};
-
-  cubick.at(16) = {XMFLOAT3(x - 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(17) = {XMFLOAT3(x + 1.0f, y - 1.0f, z - 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(18) = {XMFLOAT3(x + 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(19) = {XMFLOAT3(x - 1.0f, y + 1.0f, z - 1.0f), XMFLOAT2(0.0f, 1.0f)};
-
-  cubick.at(20) = {XMFLOAT3(x - 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(0.0f, 0.0f)};
-  cubick.at(21) = {XMFLOAT3(x + 1.0f, y - 1.0f, z + 1.0f), XMFLOAT2(1.0f, 0.0f)};
-  cubick.at(22) = {XMFLOAT3(x + 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(1.0f, 1.0f)};
-  cubick.at(23) = {XMFLOAT3(x - 1.0f, y + 1.0f, z + 1.0f), XMFLOAT2(0.0f, 1.0f)};
+  
+  float fix = y + 2.0f; // UP DIRECTION
+  cubick.at(0) =  {XMFLOAT3(x - 2, fix, z - 2), XMFLOAT2(X0, Z0)};
+  cubick.at(1) =  {XMFLOAT3(x + 2, fix, z - 2), XMFLOAT2(X1, Z0)};
+  cubick.at(2) =  {XMFLOAT3(x - 2, fix, z + 2), XMFLOAT2(X0, Z1)};
+  cubick.at(3) =  {XMFLOAT3(x + 2, fix, z + 2), XMFLOAT2(X1, Z1)};
+  fix = x + 2.0f;  // NORTH DIRECTION   
+  cubick.at(4) =  {XMFLOAT3(fix, y + 2, z - 2), XMFLOAT2(X0, Z0)};
+  cubick.at(5) =  {XMFLOAT3(fix, y + 2, z + 2), XMFLOAT2(X0, Z1)};
+  cubick.at(6) =  {XMFLOAT3(fix, y - 2, z - 2), XMFLOAT2(X1, Z0)};
+  cubick.at(7) =  {XMFLOAT3(fix, y - 2, z + 2), XMFLOAT2(X1, Z1)};
+  fix = x - 2.0f;      // SOUTH DIRECTION
+  cubick.at(8) =  {XMFLOAT3(fix, y + 2, z - 2), XMFLOAT2(X0, Z0)};
+  cubick.at(9) =  {XMFLOAT3(fix, y + 2, z + 2), XMFLOAT2(X0, Z1)};
+  cubick.at(10) = {XMFLOAT3(fix, y - 2, z - 2), XMFLOAT2(X1, Z0)};
+  cubick.at(11) = {XMFLOAT3(fix, y - 2, z + 2), XMFLOAT2(X1, Z1)};
+  fix = z + 2.0f;  // EAST DIRECTION
+  cubick.at(12) = {XMFLOAT3(x + 2, y + 2, fix), XMFLOAT2(X0, Z0)};
+  cubick.at(13) = {XMFLOAT3(x - 2, y + 2, fix), XMFLOAT2(X0, Z1)};
+  cubick.at(14) = {XMFLOAT3(x + 2, y - 2, fix), XMFLOAT2(X1, Z0)};
+  cubick.at(15) = {XMFLOAT3(x - 2, y - 2, fix), XMFLOAT2(X1, Z1)};
+  fix = z - 2.0f;  // WEST DIRECTION
+  cubick.at(16) = {XMFLOAT3(x + 2, y + 2, fix), XMFLOAT2(X0, Z0)};
+  cubick.at(17) = {XMFLOAT3(x - 2, y + 2, fix), XMFLOAT2(X0, Z1)};
+  cubick.at(18) = {XMFLOAT3(x + 2, y - 2, fix), XMFLOAT2(X1, Z0)};
+  cubick.at(19) = {XMFLOAT3(x - 2, y - 2, fix), XMFLOAT2(X1, Z1)};
+  fix = y - 2.0f;      // DOWN DIRECTON
+  cubick.at(20) = {XMFLOAT3(x - 2, fix, z - 2), XMFLOAT2(X0, Z0)};
+  cubick.at(21) = {XMFLOAT3(x + 2, fix, z - 2), XMFLOAT2(X0, Z1)};
+  cubick.at(22) = {XMFLOAT3(x - 2, fix, z + 2), XMFLOAT2(X1, Z0)};
+  cubick.at(23) = {XMFLOAT3(x + 2, fix, z + 2), XMFLOAT2(X1, Z1)};
   location_ = XMMatrixTranslation(x, y, z);
   return cubick;
 }
 
 indices Cube::init_indexed() {
-  return indices(
-      {3, 1, 0, 2, 1, 3, 6, 4, 5, 7, 4, 6, 11, 9, 8, 10, 9, 11, 14, 12, 13, 15, 12, 14, 19, 17, 16, 18, 17, 19, 22, 20, 21, 23, 20, 22});
+  return indices({
+       1,  0,  3,   0,  2,  3, // 130 320
+       4,  5,  7,   6,  4,  7,
+       9,  8, 11,   8, 10, 11, 
+      12, 13, 15,  14, 12, 15, 
+      17, 16, 19,  16, 18, 19, 
+      21, 23, 20,  23, 22, 20 });
 }
 
 void Cube::update_state(XMMATRIX& view, XMMATRIX& proj) {

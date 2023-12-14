@@ -6,7 +6,7 @@
 #include <vector>
 
 using verts = std::vector<AdvVertex>;
-using indices = std::vector<DWORD>;
+using indices = std::vector<WORD>;
 
 class Cube {
  public:

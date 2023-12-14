@@ -6,8 +6,8 @@
 
 class Camera {
  public:
-  Camera(float FOV, const position& xyz);
-  void move(const position& offset);
+  Camera(float FOV, const XMFLOAT3& xyz);
+  void move(const XMFLOAT3& offset);
   void move_side(const float speed);
   void move_straight(const float speed);
   void rotate(int dx, int dy);
@@ -21,7 +21,7 @@ class Camera {
  protected:
   XMMATRIX m_view_;
   XMMATRIX m_proj_;
-  position pos;
+  XMFLOAT3 pos;
   int restrict_x, restrict_y;
   int mouse_x, mouse_y;
   float fov;

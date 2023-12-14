@@ -161,6 +161,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Rendering\Modeler.cpp" />
     <ClCompile Include="src\Figures\Cube.cpp" />
     <ClCompile Include="src\Controllers\MsgHandler.cpp" />
     <ClCompile Include="src\Entity\Camera.cpp" />
@@ -168,11 +169,12 @@
     <ClCompile Include="src\Figures\Triangle.cpp" />
     <ClCompile Include="src\Controllers\Shaders.cpp" />
     <ClCompile Include="src\Rendering\Device.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\Rendering\Window.cpp" />
     <ClCompile Include="src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Rendering\Modeler.hh" />
     <ClInclude Include="src\Figures\Cube.h" />
     <ClInclude Include="src\Controllers\MsgHandler.h" />
     <ClInclude Include="src\Entity\AbstractEntity.h" />

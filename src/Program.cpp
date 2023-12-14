@@ -6,6 +6,7 @@
 #include <Rendering/Device.h>
 #include <Controllers/Shaders.h>
 #include <Rendering/Window.h>
+#include <Rendering/Modeler.hh>
 #include <World.h>
 
 #define SHADERPATH L"src\\Shaders\\simple.fx"
@@ -15,13 +16,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   Window window(hInstance, 1280, 720);
   Device directx;
   MsgHandler messenger;
-  Shaders shaderController;
-  World overlord;
+  Shaders shader_controller;
+  Modeler model_creator;
   Camera eye(110.0f, {10, 0, 20});
-  ID3D11VertexShader* v = shaderController.addVertexShader(SHADERPATH, "VS_Out");
-  ID3D11PixelShader* p = shaderController.addPixelShader(SHADERPATH, "PS_Out");
-  Cube cubik({20, 0, 20}, v, p);
-  Cube cubb({0, 0, -10}, v, p);
+  ID3D11VertexShader* v = shader_controller.addVertexShader(SHADERPATH, "VS_Out");
+  ID3D11PixelShader* p = shader_controller.addPixelShader(SHADERPATH, "PS_Out");
+
+  model_creator.create_model(L"Cube");
+
+  Cube cubik({20, 0, 20}, model_creator.get_model(L"Cube"), v, p);
+  Cube cubb({0, 0, -10}, model_creator.get_model(L"Cube"), v, p);
 
   while (!messenger.is_quit()) {
     if (messenger.catched_message()) {

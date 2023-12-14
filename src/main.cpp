@@ -12,7 +12,7 @@
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-  Window window(hInstance, 1280, 720);
+  Window window(hInstance, 1920, 1080);
   Device directx;
   MsgHandler messenger;
   Shaders shaderController;

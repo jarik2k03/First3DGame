@@ -1,4 +1,6 @@
 #pragma once
+#ifndef CAMERA_HH
+#define CAMERA_HH
 #include <Rendering/Device.h>
 #include <_Commons/alias.h>
 #include <_Commons/vertex.h>
@@ -26,3 +28,5 @@ class Camera {
   int mouse_x, mouse_y;
   float fov;
 };
+
+#endif // !CAMERA_HH

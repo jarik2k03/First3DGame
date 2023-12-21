@@ -145,15 +145,15 @@ D3D11_VIEWPORT Device::setViewPort(float w, float h, float minDepth, float maxDe
   return vp;
 }
 
-void Device::renderStart() {
+void Device::render_start() {
   // очищаем задний буфер
-  float ClearColor[4] = {0.722, 0.831, 0.851, 0.859};
+  float ClearColor[4] = {0.022, 0.031, 0.091, 0.159};
   ic->ClearRenderTargetView(renderTargetView, ClearColor);
   ic->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH , 1.0f, 0);
   // выброс буфера на экран
 }
 
-void Device::renderEnd() {
+void Device::render_end() {
   swapChain->Present(1, 0);
 }
 

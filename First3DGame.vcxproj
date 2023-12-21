@@ -162,11 +162,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Rendering\Modeler.cpp" />
-    <ClCompile Include="src\Figures\Cube.cpp" />
+    <ClCompile Include="src\Entity\Entity.cpp" />
     <ClCompile Include="src\Controllers\MsgHandler.cpp" />
     <ClCompile Include="src\Entity\Camera.cpp" />
-    <ClCompile Include="src\Figures\Pyramid.cpp" />
-    <ClCompile Include="src\Figures\Triangle.cpp" />
     <ClCompile Include="src\Controllers\Shaders.cpp" />
     <ClCompile Include="src\Rendering\Device.cpp" />
     <ClCompile Include="src\Program.cpp" />
@@ -175,19 +173,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Modeler.hh" />
-    <ClInclude Include="src\Figures\Cube.h" />
-    <ClInclude Include="src\Controllers\MsgHandler.h" />
-    <ClInclude Include="src\Entity\AbstractEntity.h" />
-    <ClInclude Include="src\Entity\AbstractFigure.h" />
-    <ClInclude Include="src\Entity\Camera.h" />
-    <ClInclude Include="src\Figures\Pyramid.h" />
-    <ClInclude Include="src\Figures\Triangle.h" />
+    <ClInclude Include="src\Entity\Entity.hh" />
+    <ClInclude Include="src\Controllers\MsgHandler.hh" />
+    <ClInclude Include="src\Entity\AEntity.hh" />
+    <ClInclude Include="src\Entity\Camera.hh" />
     <ClInclude Include="src\Controllers\Shaders.h" />
     <ClInclude Include="src\Resources\resource.h" />
     <ClInclude Include="src\Rendering\Device.h" />
     <ClInclude Include="src\Rendering\Window.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\_Commons\alias.h" />
+    <ClInclude Include="src\_Commons\model_layouts.h" />
     <ClInclude Include="src\_Commons\vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +199,7 @@
     <None Include=".clang-format" />
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
+    <None Include="First3DGame.exe" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

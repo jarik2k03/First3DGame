@@ -40,11 +40,12 @@ class Device {
  public:
   static ID3D11Device* d3d;
   static ID3D11DeviceContext* ic;
+
   Device();
   ~Device();
 
-  void renderStart();
-  void renderEnd();
+  void render_start();
+  void render_end();
 
   inline IDXGISwapChain* getSwapChain() {
     return swapChain;
@@ -54,4 +55,5 @@ class Device {
   }
   void switchFullScreen();
   void release();
+
 };

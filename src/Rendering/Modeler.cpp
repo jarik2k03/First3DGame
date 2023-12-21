@@ -5,10 +5,10 @@
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
 
-void Modeler::create_model(stlcwstr& name) {
+void Modeler::create_model(stlcwstr& name, const vertices& vertex_rule, const indices& index_rule) {
   model_buffer main_buffer;
-  auto vertices = init_position();
-  auto indices = init_indexed();
+  auto vertices = vertex_rule;
+  auto indices = index_rule;
   
   main_buffer.idx_len = indices.size();
 
@@ -31,11 +31,11 @@ void Modeler::create_model(stlcwstr& name) {
   saved_models.insert({name, main_buffer});
 }
 
-model_buffer Modeler::get_model(stlcwstr& name) const {
+model_buffers::const_iterator Modeler::get_model(stlcwstr& name) const {
   auto it = saved_models.find(name);
   if (it == saved_models.end())
     std::runtime_error err("Текстура для загрузки не найдена!");
-  return it->second;
+  return it;
 }
 
 void Modeler::remove_model(stlcwstr& name) {
@@ -81,45 +81,4 @@ D3D11_SUBRESOURCE_DATA Modeler::set_res_data(void* vert) {
   ZeroMemory(&bdata, sizeof(bdata));
   bdata.pSysMem = vert;
   return bdata;
-}
-
-vertices init_position() {
-  vertices cubick(24);
-  float fix = 2.0f; // UP DIRECTION
-  cubick.at(0) = {XMFLOAT3(-2, fix, -2), XMFLOAT2(X0, Z0)};
-  cubick.at(1) = {XMFLOAT3(2, fix, -2), XMFLOAT2(X1, Z0)};
-  cubick.at(2) = {XMFLOAT3(-2, fix, 2), XMFLOAT2(X0, Z1)};
-  cubick.at(3) = {XMFLOAT3(2, fix, 2), XMFLOAT2(X1, Z1)};
-  fix = 2.0f; // NORTH DIRECTION
-  cubick.at(4) = {XMFLOAT3(fix, 2, -2), XMFLOAT2(X0, Z0)};
-  cubick.at(5) = {XMFLOAT3(fix, 2, 2), XMFLOAT2(X0, Z1)};
-  cubick.at(6) = {XMFLOAT3(fix, -2, -2), XMFLOAT2(X1, Z0)};
-  cubick.at(7) = {XMFLOAT3(fix, -2, 2), XMFLOAT2(X1, Z1)};
-  fix = -2.0f; // SOUTH DIRECTION
-  cubick.at(8) = {XMFLOAT3(fix, 2, -2), XMFLOAT2(X0, Z0)};
-  cubick.at(9) = {XMFLOAT3(fix, 2, 2), XMFLOAT2(X0, Z1)};
-  cubick.at(10) = {XMFLOAT3(fix, -2, -2), XMFLOAT2(X1, Z0)};
-  cubick.at(11) = {XMFLOAT3(fix, -2, 2), XMFLOAT2(X1, Z1)};
-  fix = 2.0f; // EAST DIRECTION
-  cubick.at(12) = {XMFLOAT3(2, 2, fix), XMFLOAT2(X0, Z0)};
-  cubick.at(13) = {XMFLOAT3(-2, 2, fix), XMFLOAT2(X0, Z1)};
-  cubick.at(14) = {XMFLOAT3(2, -2, fix), XMFLOAT2(X1, Z0)};
-  cubick.at(15) = {XMFLOAT3(-2, -2, fix), XMFLOAT2(X1, Z1)};
-  fix = -2.0f; // WEST DIRECTION
-  cubick.at(16) = {XMFLOAT3(2, 2, fix), XMFLOAT2(X0, Z0)};
-  cubick.at(17) = {XMFLOAT3(-2, 2, fix), XMFLOAT2(X0, Z1)};
-  cubick.at(18) = {XMFLOAT3(2, -2, fix), XMFLOAT2(X1, Z0)};
-  cubick.at(19) = {XMFLOAT3(-2, -2, fix), XMFLOAT2(X1, Z1)};
-  fix = -2.0f; // DOWN DIRECTON
-  cubick.at(20) = {XMFLOAT3(-2, fix, -2), XMFLOAT2(X0, Z0)};
-  cubick.at(21) = {XMFLOAT3(2, fix, -2), XMFLOAT2(X0, Z1)};
-  cubick.at(22) = {XMFLOAT3(-2, fix, 2), XMFLOAT2(X1, Z0)};
-  cubick.at(23) = {XMFLOAT3(2, fix, 2), XMFLOAT2(X1, Z1)};
-
-  return cubick;
-}
-
-indices init_indexed() {
-  return indices(
-      {1, 0, 3, 0, 2, 3, 4, 5, 7, 6, 4, 7, 9, 8, 11, 8, 10, 11, 12, 13, 15, 14, 12, 15, 17, 16, 19, 16, 18, 19, 21, 23, 20, 23, 22, 20});
 }

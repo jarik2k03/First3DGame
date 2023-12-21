@@ -22,12 +22,13 @@ ID3D11VertexShader* Shaders::addVertexShader(stlcwstr& filename, stlcstr& entryP
   // создаём шейдер из скомпилированного объекта
   ID3D11VertexShader* vShader;
   hr = Device::d3d->CreateVertexShader(curBlob->GetBufferPointer(), curBlob->GetBufferSize(), NULL, &vShader);
-  H_ERRMSG(hr, L"Не удалость создать вершинный шейдер.");
-
+  H_ERRMSG(hr, L"Не удалось создать вершинный шейдер.");
+   
   int offset = 0;
-  D3D11_INPUT_ELEMENT_DESC layout[2] = {
+  D3D11_INPUT_ELEMENT_DESC layout[3] = {
       {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-      {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}};
+      {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+      {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0}};
   // создали макет вершин vertexLayout
   ID3D11InputLayout* vLayout;
   hr = Device::d3d->CreateInputLayout(layout, ARRAYSIZE(layout), curBlob->GetBufferPointer(), curBlob->GetBufferSize(), &vLayout);

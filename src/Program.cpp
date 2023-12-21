@@ -1,16 +1,16 @@
-#include <Controllers/MsgHandler.h>
-#include <Entity/Camera.h>
-#include <Figures/Cube.h>
-#include <Figures/Pyramid.h>
-#include <Figures/Triangle.h>
-#include <Rendering/Device.h>
-#include <Controllers/Shaders.h>
-#include <Rendering/Window.h>
 #include <Rendering/Modeler.hh>
-#include <World.h>
+#include <Entity/Camera.hh>
+#include <Entity/Entity.hh>
+
+#include <Controllers/MsgHandler.hh>
+#include <Controllers/Shaders.h>
+
+#include <Rendering/Window.h>
+#include <Rendering/Device.h>
+
+#include <_Commons/model_layouts.h>
 
 #define SHADERPATH L"src\\Shaders\\simple.fx"
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
   Window window(hInstance, 1280, 720);
@@ -21,11 +21,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   Camera eye(110.0f, {10, 0, 20});
   ID3D11VertexShader* v = shader_controller.addVertexShader(SHADERPATH, "VS_Out");
   ID3D11PixelShader* p = shader_controller.addPixelShader(SHADERPATH, "PS_Out");
+  ID3D11PixelShader* plight = shader_controller.addPixelShader(SHADERPATH, "PS_Light");
+  model_creator.create_model(L"Cube", cub_verts(), cub_idx());
+  //model_creator.create_model(L"Pyramid", pyramid_verts(), pyramid_idx());
 
-  model_creator.create_model(L"Cube");
-
-  Cube cubik({20, 0, 20}, model_creator.get_model(L"Cube"), v, p);
-  Cube cubb({0, 0, -10}, model_creator.get_model(L"Cube"), v, p);
+  Entity house({0, 0, 0}, model_creator.get_model(L"Cube"), v, p);
+  Entity lamp({-7, -1, 3}, model_creator.get_model(L"Cube"), v, plight);
+  lamp.set_glowing(true);
 
   while (!messenger.is_quit()) {
     if (messenger.catched_message()) {
@@ -47,16 +49,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       messenger.hide_cursor();
       messenger.set_cursor_middle();
 
-      if (messenger.is_pressed('W')) {
+      if (messenger.is_pressed('W') && !messenger.is_pressed(VK_F3)) {
         eye.move_straight(0.4f);
       }
-      if (messenger.is_pressed('S')) {
+      if (messenger.is_pressed('S') && !messenger.is_pressed(VK_F3)) {
         eye.move_straight(-0.2f);
       }
-      if (messenger.is_pressed('A')) {
+      if (messenger.is_pressed('A') && !messenger.is_pressed(VK_F3)) {
         eye.move_side(-0.3f);
       }
-      if (messenger.is_pressed('D')) {
+      if (messenger.is_pressed('D') && !messenger.is_pressed(VK_F3)) {
         eye.move_side(0.3f);
       }
       if (messenger.is_pressed(VK_SPACE)) {
@@ -65,18 +67,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       if (messenger.is_pressed(VK_SHIFT)) {
         eye.move({0.0f, -0.3f, 0.0f});
       }
-
       eye.rotate(messenger.get_cursor_dx(), messenger.get_cursor_dy());
 
+      if (messenger.is_pressed('W') && messenger.is_pressed(VK_F3)) {
+        lamp.move({0.4f, 0.0f, 0.0f});
+      }
+      if (messenger.is_pressed('S') && messenger.is_pressed(VK_F3)) {
+        lamp.move({-0.4f, 0.0f, 0.0f});
+      }
+      if (messenger.is_pressed('A') && messenger.is_pressed(VK_F3)) {
+        lamp.move({0.0f, 0.0f, -0.3f});
+      }
+      if (messenger.is_pressed('D') && messenger.is_pressed(VK_F3)) {
+        lamp.move({0.0f, 0.0f, 0.3f});
+      }
+
     matrixes:
-      cubik.update_state(eye.m_view(), eye.m_proj());
-      cubb.update_state(eye.m_view(), eye.m_proj());
+      house.update_state(eye.m_view(), eye.m_proj());
+      lamp.update_state(eye.m_view(), eye.m_proj());
 
     render:
-      directx.renderStart();
-      cubik.render();
-      cubb.render();
-      directx.renderEnd();
+      directx.render_start();
+      house.render();
+      lamp.render();
+      directx.render_end();
     }
   }
   return 0;

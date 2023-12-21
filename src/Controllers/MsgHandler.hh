@@ -19,6 +19,7 @@ class MsgHandler {
 
 
  public:
+  static stlcwstr last_entity_name;
   MSG message_;
   POINT cursor;
   POINT middle_cursor;
@@ -36,6 +37,9 @@ class MsgHandler {
   void hide_cursor();
   void set_cursor_middle();
   
+
+  DWORD cur_frame_ticks();
+  DWORD total_ticks();
   bool tick();
 
   UINT wParam() const {

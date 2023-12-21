@@ -7,6 +7,7 @@
 #include <_Commons/vertex.h>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 using vertices = std::vector<AdvVertex>;
 using indices = std::vector<WORD>;
@@ -36,8 +37,8 @@ class Modeler {
       float minLOD = 0.0f,
       float maxLOD = D3D11_FLOAT32_MAX);
  public:
-  void create_model(stlcwstr& name);
-  model_buffer get_model(stlcwstr& name) const;
+  void create_model(stlcwstr& name, const vertices& vertex_rule, const indices& index_rule);
+  model_buffers::const_iterator get_model(stlcwstr& name) const;
   void remove_model(stlcwstr& name);
 };
 

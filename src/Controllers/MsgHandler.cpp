@@ -1,6 +1,8 @@
-#include "MsgHandler.h"
+#include "MsgHandler.hh"
 
-MsgHandler::MsgHandler() : catched_quit(false){
+stlcwstr MsgHandler::last_entity_name;
+
+MsgHandler::MsgHandler() : catched_quit(false) {
   last_ticks = GetTickCount64();
   ZeroMemory(&message_, sizeof(message_));
   middle_cursor = {Window::width_ >> 1, Window::height_ >> 1};
@@ -30,7 +32,6 @@ bool MsgHandler::is_quit() {
   return catched_quit;
 }
 
-
 bool MsgHandler::is_pressed(char keychar) {
   return keys[(int)keychar];
 }
@@ -59,10 +60,18 @@ bool MsgHandler::move_event(char keychar) {
   return message_.wParam == keychar && message_.message == WM_KEYDOWN ? true : false;
 }
 
+DWORD MsgHandler::cur_frame_ticks() {
+  return GetTickCount64() - last_ticks;
+}
+
+DWORD MsgHandler::total_ticks() {
+  return GetTickCount64();
+}
+
 bool MsgHandler::tick() {
   sstream ss;
   ss << "TICKS: " << GetTickCount64() - last_ticks << "\n";
-  //CONSOLEDEBUG(ss);
+  // CONSOLEDEBUG(ss);
   DWORD current = GetTickCount64() - last_ticks;
   if (current > 12) {
     last_ticks = GetTickCount64();

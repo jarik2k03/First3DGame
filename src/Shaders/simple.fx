@@ -2,22 +2,21 @@
 Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
-cbuffer ConstantBuffer : register (b0) // b0 - индекс буфера
-{
+cbuffer PositionBuffer : register (b0) {// b0 - индекс буфера
   matrix world;
 }
-
-cbuffer CamBuffer : register(b2) // b2 - матрицы камеры
-{
-  matrix view;
-  matrix proj;
-}
-
-cbuffer LightBuffer : register(b1) // b1 - индекс буфера
-{
+cbuffer LightBuffer : register(b1) {// b1 - индекс буфера
   float4 dir;
   float4 src_color;
   float4 dest_color;
+}
+
+
+cbuffer ViewBuffer : register(b2) {// b2 - матрицы камеры
+  matrix view;
+}
+cbuffer ProjBuffer : register(b3) {// b3 - матрицы камеры 
+  matrix proj;
 }
 
 struct VS_INPUT {
@@ -45,7 +44,7 @@ PS_OUTPUT VS_Out(VS_INPUT input) {
 
 float4 PS_Out(PS_OUTPUT input) : SV_Target {
   float4 color = 0.35f;
-  color += saturate(dot(dir / 64, input.norm) * src_color);
+  color += saturate(dot(dir * 0.01, input.norm) * src_color);
   color *= dirt.Sample(sample_linear_mip, input.tex);
   return color;
 }

@@ -90,11 +90,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     render:
       directx.render_start();
-      lamp.update_state(eye.m_view(), eye.m_proj());
-      eye.update();
-      tiny.update_render(eye.m_view(), eye.m_proj());
       
+      lamp.update_state();
+      tiny.update_render();
       lamp.render();
+
+      eye.update();
       directx.render_end();
     }
   }

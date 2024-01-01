@@ -14,18 +14,11 @@ class Camera {
   void move_straight(const float speed);
   void rotate(int dx, int dy);
   void update();
-  XMMATRIX& m_view() {
-    return m_view_;
-  }
-  XMMATRIX& m_proj() {
-    return m_proj_;
-  }
 
  protected:
   D3D11_BUFFER_DESC set_const_buf(int byte_width, D3D11_USAGE usage);
-  ID3D11Buffer* cam_buf_;
-  XMMATRIX m_view_;
-  XMMATRIX m_proj_;
+  ID3D11Buffer* view_buf_;
+  ID3D11Buffer* proj_buf_;
   XMFLOAT3 pos;
   int restrict_x, restrict_y;
   int mouse_x, mouse_y;

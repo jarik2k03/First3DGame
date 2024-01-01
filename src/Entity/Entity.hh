@@ -5,7 +5,7 @@
 
 class Entity : public AEntity {
  public:
-  void update_state(XMMATRIX& view, XMMATRIX& proj) override;
+  void update_state() override;
   Entity(const XMFLOAT3& xyz, const std::pair<stlwstr, model_buffer>& b, ID3D11VertexShader* v, ID3D11PixelShader* p);
   void set_glowing(bool truth);
   void render() override;

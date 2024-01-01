@@ -6,7 +6,7 @@
 
 class AEntity {
  public:
-  virtual void update_state(XMMATRIX& view, XMMATRIX& proj) = 0;
+  virtual void update_state() = 0;
   virtual void render() = 0;
   ~AEntity() = default;
  protected:

@@ -16,7 +16,7 @@ Entity::Entity(const XMFLOAT3& xyz, const std::pair<stlwstr, model_buffer>& b, I
       model_name(b.first),
       const_light_buf_(NULL){
 
-  const auto bd = set_const_buf(sizeof(ConstantBuffer), D3D11_USAGE_DEFAULT);
+  const auto bd = set_const_buf(sizeof(PositionBuffer), D3D11_USAGE_DEFAULT);
   const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &const_buf_);
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
 
@@ -34,7 +34,7 @@ void Entity::move(const XMFLOAT3& offset) {
   pos.z += offset.z;
 }
 
-void Entity::update_state(XMMATRIX& view, XMMATRIX& proj) {
+void Entity::update_state() {
   if (const_light_buf_) {
     LightBuffer lb;
     lb.dir = XMFLOAT4(pos.x, pos.y, pos.z, 0);
@@ -43,10 +43,8 @@ void Entity::update_state(XMMATRIX& view, XMMATRIX& proj) {
     Device::ic->UpdateSubresource(const_light_buf_, 0, NULL, &lb, 0, 0);
   }
   m_world = XMMatrixTranslation(pos.x, pos.y, pos.z);  
-  cb.world = XMMatrixTranspose(m_world);
-  cb.view = XMMatrixTranspose(view);
-  cb.proj = XMMatrixTranspose(proj);
-  Device::ic->UpdateSubresource(const_buf_, 0, NULL, &cb, 0, 0);
+  m_world = XMMatrixTranspose(m_world);
+  Device::ic->UpdateSubresource(const_buf_, 0, NULL, &m_world, 0, 0);
 
 
 }

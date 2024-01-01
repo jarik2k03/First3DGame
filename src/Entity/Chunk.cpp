@@ -22,12 +22,12 @@ Chunk::Chunk(int length, const XMFLOAT3& xyz, const std::pair<stlwstr, model_buf
     blocks[i].set_pos(i / length % length, i % length, i / area);
   }
 
-  const auto bd = set_const_buf(sizeof(ConstantBuffer), D3D11_USAGE_DEFAULT);
+  const auto bd = set_const_buf(sizeof(PositionBuffer), D3D11_USAGE_DEFAULT);
   const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &const_buf_);
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
 }
 
-void Chunk::update_render(XMMATRIX& view, XMMATRIX& proj) {
+void Chunk::update_render() {
   unsigned int stride = sizeof(AdvVertex);
   unsigned int offset = 0;
   Device::ic->IASetVertexBuffers(0, 1, &vertex_buf_, &stride, &offset);
@@ -42,7 +42,7 @@ void Chunk::update_render(XMMATRIX& view, XMMATRIX& proj) {
   int volume = length * length * length;
   auto* blocks = chunk.get();
   for (size_t i = 0; i < volume; i++) {
-    blocks[i].render(pos, view, proj, &const_buf_);
+    blocks[i].render(pos, &const_buf_);
   }
 }
 

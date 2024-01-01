@@ -11,14 +11,13 @@ class Chunk {
  public:
   Chunk(int length, const XMFLOAT3& xyz, const std::pair<stlwstr, model_buffer>& b, ID3D11VertexShader* v, ID3D11PixelShader* p);
   ~Chunk();
-  void update_render(XMMATRIX& view, XMMATRIX& proj);
+  void update_render();
  private:
   std::unique_ptr <Block, std::function<void (Block*)>> chunk;
   stlwstr model_name;
   XMFLOAT3 pos;
   WORD n_indices;
   uint8_t length;
-  
   
   ID3D11Buffer* vertex_buf_;
   ID3D11Buffer* index_buf_;

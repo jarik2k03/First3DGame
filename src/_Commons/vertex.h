@@ -16,14 +16,10 @@ constexpr int chunk_size() {
   return 16 * 16 * 16;
 }
 
-struct ConstantBuffer {
-  XMMATRIX world;
-};
+using PositionBuffer = XMMATRIX;
+using ViewBuffer = XMMATRIX;
+using ProjBuffer = XMMATRIX;
 
-struct CamBuffer {
-  XMMATRIX view;
-  XMMATRIX proj;
-};
 
 struct LightBuffer {
   XMFLOAT4 dir;
@@ -38,6 +34,5 @@ struct AdvVertex {
 };
 
 static XMMATRIX m_world;
-static ConstantBuffer cb;
 
 #endif

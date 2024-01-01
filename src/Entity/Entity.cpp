@@ -4,16 +4,16 @@
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"Ошибка геометрии", MB_OK | MB_ICONEXCLAMATION);
 
-Entity::Entity(const XMFLOAT3& xyz, const model_buffers::const_iterator& b, ID3D11VertexShader* v, ID3D11PixelShader* p)
+Entity::Entity(const XMFLOAT3& xyz, const std::pair<stlwstr, model_buffer>& b, ID3D11VertexShader* v, ID3D11PixelShader* p)
     : vShader(v),
       pShader(p),
-      n_indices(b->second.idx_len),
+      n_indices(b.second.idx_len),
       pos{-xyz.x, -xyz.y, -xyz.z},
-      vertex_buf_(b->second.vertex),
-      index_buf_(b->second.index),
-      textureSRV(b->second.texture),
-      sampler_buf_(b->second.sample),
-      model_name(b->first),
+      vertex_buf_(b.second.vertex),
+      index_buf_(b.second.index),
+      textureSRV(b.second.texture),
+      sampler_buf_(b.second.sample),
+      model_name(b.first),
       const_light_buf_(NULL){
 
   const auto bd = set_const_buf(sizeof(ConstantBuffer), D3D11_USAGE_DEFAULT);
@@ -43,7 +43,6 @@ void Entity::update_state(XMMATRIX& view, XMMATRIX& proj) {
     Device::ic->UpdateSubresource(const_light_buf_, 0, NULL, &lb, 0, 0);
   }
   m_world = XMMatrixTranslation(pos.x, pos.y, pos.z);  
-  ConstantBuffer cb;
   cb.world = XMMatrixTranspose(m_world);
   cb.view = XMMatrixTranspose(view);
   cb.proj = XMMatrixTranspose(proj);
@@ -70,6 +69,7 @@ void Entity::render() {
   Device::ic->IASetVertexBuffers(0, 1, &vertex_buf_, &stride, &offset);
   Device::ic->IASetIndexBuffer(index_buf_, DXGI_FORMAT_R16_UINT, 0);
   Device::ic->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
   // биндим шейдеры
   Device::ic->VSSetShader(vShader, NULL, 0);
   Device::ic->PSSetShader(pShader, NULL, 0);

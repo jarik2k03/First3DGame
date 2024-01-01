@@ -38,6 +38,7 @@ class Device {
   D3D11_VIEWPORT setViewPort(float w, float h, float minDepth = 0.f, float maxDepth = 1.f, float topleftX = 0.f, float topleftY = 0.f);
 
  public:
+  static ID3D11Buffer* const_buf_;
   static ID3D11Device* d3d;
   static ID3D11DeviceContext* ic;
 

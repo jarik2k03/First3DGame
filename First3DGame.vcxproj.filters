@@ -5,18 +5,18 @@
     <ClCompile Include="src\Rendering\Window.cpp" />
     <ClCompile Include="src\Rendering\Device.cpp" />
     <ClCompile Include="src\Controllers\Shaders.cpp" />
-    <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\Entity\Camera.cpp" />
     <ClCompile Include="src\Controllers\MsgHandler.cpp" />
     <ClCompile Include="src\Entity\Entity.cpp" />
     <ClCompile Include="src\Rendering\Modeler.cpp" />
+    <ClCompile Include="src\Entity\Block.cpp" />
+    <ClCompile Include="src\Entity\Chunk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Rendering\Window.h" />
     <ClInclude Include="src\Rendering\Device.h" />
     <ClInclude Include="src\Resources\resource.h" />
     <ClInclude Include="src\Controllers\Shaders.h" />
-    <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Entity\AEntity.hh" />
     <ClInclude Include="src\Entity\Camera.hh" />
     <ClInclude Include="src\_Commons\alias.h" />
@@ -25,6 +25,8 @@
     <ClInclude Include="src\_Commons\vertex.h" />
     <ClInclude Include="src\Rendering\Modeler.hh" />
     <ClInclude Include="src\_Commons\model_layouts.h" />
+    <ClInclude Include="src\Entity\Block.hh" />
+    <ClInclude Include="src\Entity\Chunk.hh" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\icons\dx11.ico" />

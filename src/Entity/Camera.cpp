@@ -61,3 +61,8 @@ void Camera::move(const XMFLOAT3& offset) {
   ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
   CONSOLEDEBUG(ss);
 }
+
+void Camera::update() {
+  
+  Device::ic->UpdateSubresource();
+}

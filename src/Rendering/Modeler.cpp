@@ -31,11 +31,11 @@ void Modeler::create_model(stlcwstr& name, const vertices& vertex_rule, const in
   saved_models.insert({name, main_buffer});
 }
 
-model_buffers::const_iterator Modeler::get_model(stlcwstr& name) const {
+std::pair<stlwstr, model_buffer> Modeler::get_model(stlcwstr& name) const {
   auto it = saved_models.find(name);
   if (it == saved_models.end())
     std::runtime_error err("Текстура для загрузки не найдена!");
-  return it;
+  return make_pair(name, it->second);
 }
 
 void Modeler::remove_model(stlcwstr& name) {

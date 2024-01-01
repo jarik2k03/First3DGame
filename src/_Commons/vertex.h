@@ -12,10 +12,15 @@
 #define Z0 0.0f
 #define Z1 1.0f
 
-static XMMATRIX m_world;
+constexpr int chunk_size() {
+  return 16 * 16 * 16;
+}
 
 struct ConstantBuffer {
   XMMATRIX world;
+};
+
+struct CamBuffer {
   XMMATRIX view;
   XMMATRIX proj;
 };
@@ -32,5 +37,7 @@ struct AdvVertex {
   XMFLOAT3 normal;
 };
 
+static XMMATRIX m_world;
+static ConstantBuffer cb;
 
 #endif

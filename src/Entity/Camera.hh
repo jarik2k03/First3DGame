@@ -13,6 +13,7 @@ class Camera {
   void move_side(const float speed);
   void move_straight(const float speed);
   void rotate(int dx, int dy);
+  void update();
   XMMATRIX& m_view() {
     return m_view_;
   }
@@ -21,6 +22,7 @@ class Camera {
   }
 
  protected:
+  ID3D11Buffer* cam_buf_;
   XMMATRIX m_view_;
   XMMATRIX m_proj_;
   XMFLOAT3 pos;

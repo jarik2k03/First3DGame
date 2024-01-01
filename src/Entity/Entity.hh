@@ -5,8 +5,8 @@
 
 class Entity : public AEntity {
  public:
-  Entity(const XMFLOAT3& xyz, const model_buffers::const_iterator& b, ID3D11VertexShader* v, ID3D11PixelShader* p);
   void update_state(XMMATRIX& view, XMMATRIX& proj) override;
+  Entity(const XMFLOAT3& xyz, const std::pair<stlwstr, model_buffer>& b, ID3D11VertexShader* v, ID3D11PixelShader* p);
   void set_glowing(bool truth);
   void render() override;
   void move(const XMFLOAT3& offset);

@@ -7,6 +7,7 @@
 // статические интерфейсы
 ID3D11Device* Device::d3d;
 ID3D11DeviceContext* Device::ic;
+ID3D11Buffer* Device::const_buf_;
 
 Device::Device() : featureLevel(D3D_FEATURE_LEVEL_11_0), driverType(D3D_DRIVER_TYPE_NULL), swapChain(NULL), renderTargetView(NULL) {
   RECT rect;
@@ -147,7 +148,7 @@ D3D11_VIEWPORT Device::setViewPort(float w, float h, float minDepth, float maxDe
 
 void Device::render_start() {
   // очищаем задний буфер
-  float ClearColor[4] = {0.022, 0.031, 0.091, 0.159};
+  float ClearColor[4] = {0.002, 0.003, 0.001, 0.159};
   ic->ClearRenderTargetView(renderTargetView, ClearColor);
   ic->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH , 1.0f, 0);
   // выброс буфера на экран

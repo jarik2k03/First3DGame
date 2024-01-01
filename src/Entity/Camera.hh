@@ -22,6 +22,7 @@ class Camera {
   }
 
  protected:
+  D3D11_BUFFER_DESC set_const_buf(int byte_width, D3D11_USAGE usage);
   ID3D11Buffer* cam_buf_;
   XMMATRIX m_view_;
   XMMATRIX m_proj_;

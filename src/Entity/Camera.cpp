@@ -8,8 +8,13 @@ Camera::Camera(float FOV_angle, const XMFLOAT3& xyz) : fov(FOV_angle * XM_PI / 1
   restrict_y = static_cast<int>(static_cast<float>(Window::height_) * 2 * XM_PIDIV4);
 
   m_proj_ = XMMatrixPerspectiveFovLH(fov, Window::width_ / (float)Window::height_, 0.01f, 100.0f);
+  const auto bd = set_const_buf(sizeof(CamBuffer), D3D11_USAGE_DEFAULT);
+  const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &cam_buf_);
   // 3 аргумент - самое ближнее видимое рассто€ние, 4 аргумент - самое дальнее
 }
+
+
+
 
 void Camera::rotate(int dx, int dy) {
   mouse_x -= dx, mouse_y -= dy;
@@ -63,6 +68,20 @@ void Camera::move(const XMFLOAT3& offset) {
 }
 
 void Camera::update() {
-  
-  Device::ic->UpdateSubresource();
+  CamBuffer cb;
+  cb.view = XMMatrixTranspose(m_view_);
+  cb.proj = XMMatrixTranspose(m_proj_);
+  Device::ic->UpdateSubresource(cam_buf_, 0, NULL, &cb, 0, 0);
+}
+
+
+
+D3D11_BUFFER_DESC Camera::set_const_buf(int byte_width, D3D11_USAGE usage) {
+  D3D11_BUFFER_DESC bd;
+  ZeroMemory(&bd, sizeof(bd));
+  bd.Usage = usage;
+  bd.ByteWidth = byte_width;
+  bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER; // - тип буфера буфер вершин
+  bd.CPUAccessFlags = 0;
+  return bd;
 }

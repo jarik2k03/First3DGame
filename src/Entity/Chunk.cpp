@@ -18,13 +18,14 @@ Chunk::Chunk(int length, const XMFLOAT3& xyz, const std::pair<stlwstr, model_buf
   auto* blocks = chunk.get();
   int volume = length * length * length;
   int area = length * length;
-  // for (size_t i = 0; i < volume; i++) {
-  //   blocks[i].set_pos(i / length % length, i % length, i / area);
-  // }
 
   const auto bd = set_const_buf(sizeof(Block) * volume, D3D11_USAGE_DEFAULT);
-  const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &chunk_buf_);
+  D3D11_SUBRESOURCE_DATA d = {0};
+  d.pSysMem = blocks;
+  const auto hr = Device::d3d->CreateBuffer(&bd, &d, &chunk_buf_);
+  Device::ic->VSSetConstantBuffers(4, 1, &chunk_buf_);
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
+
 
 }
 
@@ -44,18 +45,17 @@ void Chunk::update_render() {
   auto* blocks = chunk.get();
 
   for (size_t i = 0; i < volume; i++) {
-    if(blocks[i].is_shown())
         blocks[i].render(pos, &chunk_buf_);
   }
 }
 
-D3D11_BUFFER_DESC Chunk::set_const_buf(int byte_width, D3D11_USAGE usage) {
+D3D11_BUFFER_DESC Chunk::set_const_buf(int byte_width, D3D11_USAGE usage, D3D11_CPU_ACCESS_FLAG cpu_access) {
   D3D11_BUFFER_DESC bd;
   ZeroMemory(&bd, sizeof(bd));
   bd.Usage = usage;
   bd.ByteWidth = byte_width;
   bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER; // - тип буфера буфер вершин
-  bd.CPUAccessFlags = 0;
+  bd.CPUAccessFlags = cpu_access;
   return bd;
 }
 Chunk::~Chunk() {

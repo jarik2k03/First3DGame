@@ -1,9 +1,15 @@
+static int block_counter = 0;
+
 Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
-cbuffer ChunkPosBuffer : register(b4){
-  half blocks[4096]; // 16x16x16 чанк
-  int counter;
+struct Block {
+  half id;
+  half number;
+};
+
+cbuffer ChunkPosBuffer : register(b4) {
+    half visible_blocks[4096];
 }
 
 cbuffer PositionBuffer : register (b0) {// b0 - индекс буфера
@@ -39,12 +45,24 @@ struct PS_OUTPUT // Входящие данные пиксельного шейдера
 
 PS_OUTPUT VS_Out(VS_INPUT input) {
 	PS_OUTPUT output = (PS_OUTPUT)0; // создали нашу структуру
-	output.pos = mul(input.pos, world); // трансформация позиции вершины в матрицу мира
+    output.pos = input.pos + world._m30_m31_m32_m33; // трансформация позиции вершины в матрицу мира
 	output.pos = mul(output.pos, view); // в матрицу вида
 	output.pos = mul(output.pos, proj); // в матрицу проекции
 	output.norm = mul(input.norm, world);
 	output.tex = input.tex;
 	return output;
+}
+
+PS_OUTPUT VS_Chunk(VS_INPUT input) {
+  float4 position = (1, 112 / 16 % 16, 112 % 16, 112 / 256); // 112 Блок
+  PS_OUTPUT output = (PS_OUTPUT)0; // создали нашу структуру
+  output.pos = input.pos + position; // трансформация позиции вершины в матрицу мира
+  output.pos = mul(output.pos, view); // в матрицу вида
+  output.pos = mul(output.pos, proj); // в матрицу проекции
+  output.norm = mul(input.norm, world);
+  output.tex = input.tex;
+  block_counter++;
+  return output;
 }
 
 float4 PS_Out(PS_OUTPUT input) : SV_Target {

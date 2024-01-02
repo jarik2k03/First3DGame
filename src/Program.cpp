@@ -19,18 +19,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   MsgHandler messenger;
   Shaders shader_controller;
   Modeler model_creator;
-  Camera eye(110.0f, {10, 0, 20});
+
   ID3D11VertexShader* v = shader_controller.addVertexShader(SHADERPATH, "VS_Out");
+  ID3D11VertexShader* vchunk = shader_controller.addVertexShader(SHADERPATH, "VS_Chunk");
   ID3D11PixelShader* p = shader_controller.addPixelShader(SHADERPATH, "PS_Out");
   ID3D11PixelShader* plight = shader_controller.addPixelShader(SHADERPATH, "PS_Light");
   model_creator.create_model(L"Cube", cub_verts(), cub_idx());
   //model_creator.create_model(L"Pyramid", pyramid_verts(), pyramid_idx());
   auto cub = model_creator.get_model(L"Cube");
 
+  Camera eye(110.0f, {0, 0, 0});
+  Chunk tiny(16, {0, 0, 0}, cub, vchunk, p);
 
-  Chunk tiny(16, {0, 0, 0}, cub, v, p);
-
-  Entity lamp({-7, -100, 3}, model_creator.get_model(L"Cube"), v, plight);
+  Entity lamp({7, -10, 1}, model_creator.get_model(L"Cube"), v, plight);
   lamp.set_glowing(true);
 
   while (!messenger.is_quit()) {
@@ -92,8 +93,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
       directx.render_start();
       
       lamp.update_state();
-      tiny.update_render();
       lamp.render();
+      tiny.update_render();
+
 
       eye.update();
       directx.render_end();

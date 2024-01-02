@@ -1,6 +1,10 @@
-
 Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
+
+cbuffer ChunkPosBuffer : register(b4){
+  half blocks[4096]; // 16x16x16 чанк
+  int counter;
+}
 
 cbuffer PositionBuffer : register (b0) {// b0 - индекс буфера
   matrix world;
@@ -11,13 +15,13 @@ cbuffer LightBuffer : register(b1) {// b1 - индекс буфера
   float4 dest_color;
 }
 
-
 cbuffer ViewBuffer : register(b2) {// b2 - матрицы камеры
   matrix view;
 }
 cbuffer ProjBuffer : register(b3) {// b3 - матрицы камеры 
   matrix proj;
 }
+
 
 struct VS_INPUT {
 	float4 pos : POSITION;
@@ -32,6 +36,7 @@ struct PS_OUTPUT // ¬ход€щие данные пиксельного шейдера
   float3 norm : TEXCOORD1;
 };
 
+
 PS_OUTPUT VS_Out(VS_INPUT input) {
 	PS_OUTPUT output = (PS_OUTPUT)0; // создали нашу структуру
 	output.pos = mul(input.pos, world); // трансформаци€ позиции вершины в матрицу мира
@@ -44,7 +49,7 @@ PS_OUTPUT VS_Out(VS_INPUT input) {
 
 float4 PS_Out(PS_OUTPUT input) : SV_Target {
   float4 color = 0.35f;
-  color += saturate(dot(dir * 0.01, input.norm) * src_color);
+  color += saturate(dot(dir * 0.1, input.norm) * src_color);
   color *= dirt.Sample(sample_linear_mip, input.tex);
   return color;
 }

@@ -1,7 +1,6 @@
 #pragma once
 #ifndef CHUNK_HH
 #define CHUNK_HH
-#include <Entity/Entity.hh>
 #include <Entity/Block.hh>
 #include <functional>
 #include <array>
@@ -21,7 +20,7 @@ class Chunk {
   
   ID3D11Buffer* vertex_buf_;
   ID3D11Buffer* index_buf_;
-  ID3D11Buffer* const_buf_;
+  ID3D11Buffer* chunk_buf_;
 
   ID3D11SamplerState* sampler_buf_;
   ID3D11ShaderResourceView* textureSRV;

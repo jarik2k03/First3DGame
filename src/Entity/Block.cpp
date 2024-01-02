@@ -1,25 +1,18 @@
 #include "Block.hh"
 
-Block::Block() {
+Block::Block() : id(0), shown_faces(1) {
 }
 
-Block::Block(uint16_t id, uint8_t x, uint8_t y, uint8_t z) : id(id), x(x), y(y), z(z) {
+Block::Block(uint16_t id) : id(id), shown_faces(1){
 }
 
 Block::~Block() {
 }
 
-void Block::set_pos(uint8_t x, uint8_t y, uint8_t z) {
-  this->x = x;
-  this->y = y;
-  this->z = z;
+bool Block::is_shown() {
+  return shown_faces;
 }
 
 void Block::render(const XMFLOAT3& chunk_pos, ID3D11Buffer** const_buf_) {
-  m_world = XMMatrixTranslation(chunk_pos.x + x, chunk_pos.y + y, chunk_pos.z + z);
-  
-  m_world = XMMatrixTranspose(m_world);
-  
-  Device::ic->UpdateSubresource(*const_buf_, 0, NULL, &m_world, 0, 0);
   Device::ic->DrawIndexed(36, 0, 0);
 }

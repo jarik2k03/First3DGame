@@ -18,13 +18,14 @@ Chunk::Chunk(int length, const XMFLOAT3& xyz, const std::pair<stlwstr, model_buf
   auto* blocks = chunk.get();
   int volume = length * length * length;
   int area = length * length;
-  for (size_t i = 0; i < volume; i++) {
-    blocks[i].set_pos(i / length % length, i % length, i / area);
-  }
+  // for (size_t i = 0; i < volume; i++) {
+  //   blocks[i].set_pos(i / length % length, i % length, i / area);
+  // }
 
-  const auto bd = set_const_buf(sizeof(PositionBuffer), D3D11_USAGE_DEFAULT);
-  const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &const_buf_);
+  const auto bd = set_const_buf(sizeof(Block) * volume, D3D11_USAGE_DEFAULT);
+  const auto hr = Device::d3d->CreateBuffer(&bd, NULL, &chunk_buf_);
   H_WARNMSG(hr, L"Ошибка инициализации константного буфера");
+
 }
 
 void Chunk::update_render() {
@@ -35,14 +36,16 @@ void Chunk::update_render() {
   Device::ic->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   Device::ic->VSSetShader(v_shader, NULL, 0);
   Device::ic->PSSetShader(p_shader, NULL, 0);
-  Device::ic->VSSetConstantBuffers(0, 1, &const_buf_);
+  Device::ic->VSSetConstantBuffers(4, 1, &chunk_buf_);
   Device::ic->PSSetShaderResources(0, 1, &textureSRV);
   Device::ic->PSSetSamplers(0, 1, &sampler_buf_);
 
   int volume = length * length * length;
   auto* blocks = chunk.get();
+
   for (size_t i = 0; i < volume; i++) {
-    blocks[i].render(pos, &const_buf_);
+    if(blocks[i].is_shown())
+        blocks[i].render(pos, &chunk_buf_);
   }
 }
 

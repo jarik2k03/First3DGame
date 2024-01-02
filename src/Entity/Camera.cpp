@@ -8,13 +8,12 @@ Camera::Camera(float FOV_angle, const XMFLOAT3& xyz) : fov(FOV_angle * XM_PI / 1
 
   XMMATRIX m_proj_ = XMMatrixPerspectiveFovLH(fov, Window::width_ / (float)Window::height_, 0.01f, 100.0f);
   m_proj_ = XMMatrixTranspose(m_proj_);
-  const auto bd = set_const_buf(sizeof(XMMATRIX), D3D11_USAGE_DEFAULT);
+  const auto bd = set_const_buf(sizeof(ProjBuffer), D3D11_USAGE_DEFAULT);
   const auto hr_v = Device::d3d->CreateBuffer(&bd, NULL, &view_buf_);
   D3D11_SUBRESOURCE_DATA init = {0};
   init.pSysMem = &m_proj_;
   const auto hr_p = Device::d3d->CreateBuffer(&bd, &init, &proj_buf_);
   Device::ic->VSSetConstantBuffers(3, 1, &proj_buf_);
-  // 3 аргумент - самое ближнее видимое расстояние, 4 аргумент - самое дальнее
 }
 
 

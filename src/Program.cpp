@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   auto cub = model_creator.get_model(L"Cube");
 
 
-  Chunk tiny(10, {0, 0, 0}, cub, v, p);
+  Chunk tiny(16, {0, 0, 0}, cub, v, p);
 
   Entity lamp({-7, -100, 3}, model_creator.get_model(L"Cube"), v, plight);
   lamp.set_glowing(true);

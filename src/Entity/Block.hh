@@ -8,7 +8,7 @@ class Block {
   Block();
   Block(uint16_t id);
   ~Block();
-  void render(const XMFLOAT3& chunk_pos, ID3D11Buffer** const_buf_);
+  void render(ID3D11VertexShader* v);
   bool is_shown();
   uint16_t id();
  private:

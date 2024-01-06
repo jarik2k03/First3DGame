@@ -33,9 +33,6 @@ void Camera::move_side(const float speed) {
   const float calc_dx = speed * rot_x, calc_dz = speed * rot_z;
   pos.z -= calc_dx; // calc_dx;
   pos.x -= calc_dz; // calc_dz;
-  sstream ss;
-  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
-  CONSOLEDEBUG(ss);
 }
 
 void Camera::move_straight(const float speed) {
@@ -46,18 +43,10 @@ void Camera::move_straight(const float speed) {
   const float calc_dx = speed * rot_x, calc_dz = speed * rot_z;
   pos.z -= calc_dz; // calc_dx;
   pos.x += calc_dx; // calc_dz;
-
-  sstream ss;
-  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
-  CONSOLEDEBUG(ss);
 }
 
 void Camera::move(const XMFLOAT3& offset) {
   pos.x -= offset.x, pos.y -= offset.y, pos.z -= offset.z;
-
-  sstream ss;
-  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
-  CONSOLEDEBUG(ss);
 }
 
 void Camera::update() {
@@ -68,6 +57,10 @@ void Camera::update() {
   m_view_ = XMMatrixTranspose(m_view_);
   Device::ic->UpdateSubresource(view_buf_, 0, NULL, &m_view_, 0, 0);
   Device::ic->VSSetConstantBuffers(2, 1, &view_buf_);
+
+  sstream ss;
+  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
+  COUT(ss);
 }
 
 

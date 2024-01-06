@@ -1,4 +1,4 @@
-#include "Shaders.h"
+#include "Shaders.hh"
 
 #define H_ERRMSG(hr, text)                                           \
   if (FAILED(hr)) {                                                  \
@@ -34,9 +34,9 @@ ID3D11VertexShader* Shaders::addVertexShader(stlcwstr& filename, stlcstr& entryP
   hr = Device::d3d->CreateInputLayout(layout, ARRAYSIZE(layout), curBlob->GetBufferPointer(), curBlob->GetBufferSize(), &vLayout);
   curBlob->Release();
   H_ERRMSG(hr, L"Не создаётся макет вершин");
-  Device::ic->IASetInputLayout(vLayout);
 
-  vertexShaders.insert(std::make_pair(entryPoint, vShader)); // запись вершинного шейдера в ассоц массив
+
+
   vertexLayouts.insert(std::make_pair(entryPoint, vLayout)); // запись вершинного макета в ассоц массив
   return vShader;
 }
@@ -51,8 +51,6 @@ ID3D11PixelShader* Shaders::addPixelShader(stlcwstr& filename, stlcstr& entryPoi
   hr = Device::d3d->CreatePixelShader(curBlob->GetBufferPointer(), curBlob->GetBufferSize(), NULL, &pShader);
   H_ERRMSG(hr, L"Не удалось создать пиксельный шейдер.");
   curBlob->Release();
-
-  pixelShaders.insert(std::make_pair(entryPoint, pShader)); // запись пискельного шейдера в ассоц массив
   return pShader;
 }
 
@@ -60,7 +58,7 @@ HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcst
   HRESULT hr = S_OK;
   DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
   ID3DBlob* errInfo; // список ошибок
-  hr = D3DX11CompileFromFile(
+  hr = D3DX11CompileFromFileW(
       filename.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(), shaderFlags, 0, NULL, o_blob, &errInfo, NULL);
 
   if (FAILED(hr)) {
@@ -75,17 +73,7 @@ HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcst
   return S_OK;
 }
 
-ID3D11VertexShader* Shaders::getVertexShader(stlstr& entryPoint) {
-  auto it = vertexShaders.find(entryPoint);
-  return ((it != vertexShaders.end()) ? (it->second) : (NULL));
-}
-
-ID3D11InputLayout* Shaders::getVertexLayout(stlstr& entryPoint) {
+ID3D11InputLayout* Shaders::getVertexLayout(stlcstr& entryPoint) {
   auto it = vertexLayouts.find(entryPoint);
   return ((it != vertexLayouts.end()) ? (it->second) : (NULL));
-}
-
-ID3D11PixelShader* Shaders::getPixelShader(stlstr& entryPoint) {
-  auto it = pixelShaders.find(entryPoint);
-  return ((it != pixelShaders.end()) ? (it->second) : (NULL));
 }

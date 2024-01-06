@@ -16,7 +16,7 @@
     <ClInclude Include="src\Rendering\Window.h" />
     <ClInclude Include="src\Rendering\Device.h" />
     <ClInclude Include="src\Resources\resource.h" />
-    <ClInclude Include="src\Controllers\Shaders.h" />
+    <ClInclude Include="src\Controllers\Shaders.hh" />
     <ClInclude Include="src\Entity\AEntity.hh" />
     <ClInclude Include="src\Entity\Camera.hh" />
     <ClInclude Include="src\_Commons\alias.h" />
@@ -27,6 +27,8 @@
     <ClInclude Include="src\_Commons\model_layouts.h" />
     <ClInclude Include="src\Entity\Block.hh" />
     <ClInclude Include="src\Entity\Chunk.hh" />
+    <ClInclude Include="src\Controllers\AShader.hh" />
+    <ClInclude Include="src\Controllers\VShader.hh" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\icons\dx11.ico" />

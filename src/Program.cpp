@@ -26,6 +26,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   auto* vlaychunk = shader_controller.getVertexLayout("VS_Chunk");
   auto* plight = shader_controller.addPixelShader(SHADERPATH, "PS_Light");
   
+  auto hr = shader_controller.compile_file(SHADERPATH);
+
   model_creator.create_model(L"Cube", cub_verts(), cub_idx());
   //model_creator.create_model(L"Pyramid", pyramid_verts(), pyramid_idx());
   auto cub = model_creator.get_model(L"Cube");

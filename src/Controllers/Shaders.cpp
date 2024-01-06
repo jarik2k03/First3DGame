@@ -1,5 +1,9 @@
 #include "Shaders.hh"
 
+#define ERRMSG(text)                                               \
+  MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONHAND); \
+  exit(-1);
+
 #define H_ERRMSG(hr, text)                                           \
   if (FAILED(hr)) {                                                  \
     MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONHAND); \
@@ -9,7 +13,8 @@
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
 
-Shaders::Shaders() {
+Shaders::Shaders()
+    : versions({"s_4_0", "s_4_1", "s_5_0"}), hlsl_types({{"int", 4}, {"dword", 4}, {"float", 4}, {"half", 2}, {"bool", 1}}) {
 }
 
 Shaders::~Shaders() {
@@ -23,7 +28,7 @@ ID3D11VertexShader* Shaders::addVertexShader(stlcwstr& filename, stlcstr& entryP
   ID3D11VertexShader* vShader;
   hr = Device::d3d->CreateVertexShader(curBlob->GetBufferPointer(), curBlob->GetBufferSize(), NULL, &vShader);
   H_ERRMSG(hr, L"Не удалось создать вершинный шейдер.");
-   
+
   int offset = 0;
   D3D11_INPUT_ELEMENT_DESC layout[3] = {
       {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -34,8 +39,6 @@ ID3D11VertexShader* Shaders::addVertexShader(stlcwstr& filename, stlcstr& entryP
   hr = Device::d3d->CreateInputLayout(layout, ARRAYSIZE(layout), curBlob->GetBufferPointer(), curBlob->GetBufferSize(), &vLayout);
   curBlob->Release();
   H_ERRMSG(hr, L"Не создаётся макет вершин");
-
-
 
   vertexLayouts.insert(std::make_pair(entryPoint, vLayout)); // запись вершинного макета в ассоц массив
   return vShader;
@@ -54,9 +57,63 @@ ID3D11PixelShader* Shaders::addPixelShader(stlcwstr& filename, stlcstr& entryPoi
   return pShader;
 }
 
+int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
+  auto supported_version = std::find(versions.begin(), versions.end(), shader_version);
+  if (supported_version == versions.end())
+    std::runtime_error e("Недоступная версия шейдера.");
+
+  std::ifstream src(filepath.c_str());
+  if (!src) {
+    ERRMSG(L"Отстутствует шейдер-файл в текущем каталоге.");
+  }
+  auto doc = parse_hlsl_file(src);
+
+  //    hr = D3DX11CompileFromFileW(
+  //    filename.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(),
+  //    shaderFlags, 0, NULL, o_blob, &errInfo, NULL);
+  return 0;
+}
+
+std::vector<stlstr> Shaders::parse_hlsl_file(std::ifstream& src) {
+  std::vector<stlstr> read;
+  const_buffers cb_umap;
+
+  separator delim("{\n :)(");
+  stlcstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
+  tokenizer tok(file_string, delim);
+
+  sstream ss("СТАТУС ЗАГРУЗКИ: ");
+  for (auto it = tok.begin(); it != tok.end(); ++it) {
+    // ss << *it << "|\n";
+    if (*it == "cbuffer") {
+      cb_name name = *(++it);
+      ++it; // слово "register"
+      cb_id id((++it)->substr(1));
+
+      ss << name << " " << id.num << '\n';
+      // ss << name << '+';
+    }
+    // ss << *it << '+';
+  }
+
+  COUTNL(ss);
+
+  sstream separated({std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()});
+
+  stlstr str;
+  cb_name name;
+  cb_id id;
+
+  while (separated >> str) {
+    if (str == "cbuffer") {
+    }
+  }
+  return read;
+}
+
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {
   HRESULT hr = S_OK;
-  DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+  const DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
   ID3DBlob* errInfo; // список ошибок
   hr = D3DX11CompileFromFileW(
       filename.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(), shaderFlags, 0, NULL, o_blob, &errInfo, NULL);

@@ -58,9 +58,9 @@ void Camera::update() {
   Device::ic->UpdateSubresource(view_buf_, 0, NULL, &m_view_, 0, 0);
   Device::ic->VSSetConstantBuffers(2, 1, &view_buf_);
 
-  sstream ss;
-  ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
-  COUT(ss);
+  //sstream ss;
+  //ss << "X: " << pos.x << " Y: " << pos.y << " Z: " << pos.z << '\n';
+  //COUT(ss);
 }
 
 

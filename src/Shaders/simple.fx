@@ -4,11 +4,9 @@ SamplerState sample_linear_mip : register(s0);
 struct Block {
   half id;
   half number;
-};
+}; 
 
-
-
-cbuffer Counter : register(b5) {
+cbuffer Counter : register (b5) {
   int counter;
   int csize;
   int carea;
@@ -71,9 +69,9 @@ PS_OUTPUT VS_Out(VS_INPUT input) {
 }
 
 PS_OUTPUT VS_Chunk(VS_INPUT input) {
-  float x = visible_blocks[counter / csize % csize];
-  float y = visible_blocks[counter % csize];
-  float z = visible_blocks[counter / carea];
+  float x = visible_blocks[counter / csize % csize] / 4;
+  float y = visible_blocks[counter % csize] / 4;
+  float z = visible_blocks[counter / carea] / 4;
 
   float4x4 worlld = CreateTranslationMatrix(float3(x, y, z));
   PS_OUTPUT output = (PS_OUTPUT)0; // создали нашу структуру

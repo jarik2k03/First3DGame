@@ -85,7 +85,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\VSprojects\First3DGame\src;C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files\boost_1_82_0;D:\VSprojects\First3DGame\src;C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -188,6 +188,7 @@
     <ClInclude Include="src\_Commons\alias.h" />
     <ClInclude Include="src\Controllers\VShader.hh" />
     <ClInclude Include="src\_Commons\model_layouts.h" />
+    <ClInclude Include="src\_Commons\modtype.h" />
     <ClInclude Include="src\_Commons\vertex.h" />
   </ItemGroup>
   <ItemGroup>

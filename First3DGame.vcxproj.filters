@@ -29,6 +29,7 @@
     <ClInclude Include="src\Entity\Chunk.hh" />
     <ClInclude Include="src\Controllers\AShader.hh" />
     <ClInclude Include="src\Controllers\VShader.hh" />
+    <ClInclude Include="src\_Commons\modtype.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\icons\dx11.ico" />

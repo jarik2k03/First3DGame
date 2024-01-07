@@ -4,7 +4,11 @@ SamplerState sample_linear_mip : register(s0);
 struct Block {
   half id;
   half number;
-}; 
+} b; 
+
+struct Tempor {
+  Block bl;
+};
 
 cbuffer Counter : register (b5) {
   int counter;
@@ -30,6 +34,10 @@ cbuffer ViewBuffer : register(b2) { // b2 - матрицы камеры
 }
 cbuffer ProjBuffer : register(b3) { // b3 - матрицы камеры
   matrix proj;
+}
+
+cbuffer temp : register(b12) {
+  struct Block be;
 }
 
 struct VS_INPUT {

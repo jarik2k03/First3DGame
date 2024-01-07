@@ -1,5 +1,7 @@
 #include "Shaders.hh"
 
+#define PACK_SIZE 16
+
 #define ERRMSG(text)                                               \
   MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONHAND); \
   exit(-1);
@@ -14,7 +16,8 @@
     MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
 
 Shaders::Shaders()
-    : versions({"s_4_0", "s_4_1", "s_5_0"}), hlsl_types({{"int", 4}, {"dword", 4}, {"float", 4}, {"half", 2}, {"bool", 1}}) {
+    : versions({"s_4_0", "s_4_1", "s_5_0"}),
+      hlsl_types({{"int", 4}, {"dword", 4}, {"float", 4}, {"half", 2}, {"bool", 1}, {"matrix", 64}, {"float2", 8}, {"float3", 12}}) {
 }
 
 Shaders::~Shaders() {
@@ -66,7 +69,7 @@ int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
   if (!src) {
     ERRMSG(L"Отстутствует шейдер-файл в текущем каталоге.");
   }
-  auto doc = parse_hlsl_file(src);
+  auto doc = parse_hlsl_file_(src);
 
   //    hr = D3DX11CompileFromFileW(
   //    filename.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(),
@@ -74,41 +77,44 @@ int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
   return 0;
 }
 
-std::vector<stlstr> Shaders::parse_hlsl_file(std::ifstream& src) {
+std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   std::vector<stlstr> read;
-  const_buffers cb_umap;
+  //const_buffers cb_umap;
 
-  separator delim("{\n :)(");
+  separator delim(" \n", ":;(){}[]");
   stlcstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
   tokenizer tok(file_string, delim);
 
-  sstream ss("СТАТУС ЗАГРУЗКИ: ");
+  sstream ss;
   for (auto it = tok.begin(); it != tok.end(); ++it) {
-    // ss << *it << "|\n";
-    if (*it == "cbuffer") {
-      cb_name name = *(++it);
-      ++it; // слово "register"
-      cb_id id((++it)->substr(1));
-
-      ss << name << " " << id.num << '\n';
-      // ss << name << '+';
+    ss << *it << " ";
+    if (*it == "struct") {
+      init_hlsl_struct__(std::move(it));
     }
-    // ss << *it << '+';
   }
-
   COUTNL(ss);
 
-  sstream separated({std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()});
-
-  stlstr str;
-  cb_name name;
-  cb_id id;
-
-  while (separated >> str) {
-    if (str == "cbuffer") {
-    }
-  }
   return read;
+}
+
+unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word) {
+  stlcstr name = *(++word);
+  int free_space = PACK_SIZE, fullsize = 0;
+  while (word->at(0) != '}') {
+    if (*word == "struct") {
+      ++word; // случай struct Temp tmp; <=> Temp tmp;
+    }
+    //int type_size = hlsl_types.find(*(++word))->second; // Temp
+    //free_space -= type_size;
+    if (free_space <= 0) {
+      //free_space = -free_space % type_size, fullsize += type_size;
+    }
+
+    *(++word); // название переменной [optional] // tmp
+    *(++word); // ;
+  }
+
+  return fullsize;
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

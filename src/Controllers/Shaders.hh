@@ -16,6 +16,9 @@
 #include <unordered_map>
 #include <vector>
 
+using struct_name = stlstr;
+using struct_size = unsigned int;
+
 using cb_name = stlstr;
 using cb_size = unsigned int;
 using cb_id = mod_int;
@@ -48,7 +51,9 @@ class Shaders {
   std::map<stlstr, int> hlsl_types;
   HRESULT compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** blobOut);
 
-  std::vector<stlstr> parse_hlsl_file(std::ifstream& src);
+  std::vector<stlstr> parse_hlsl_file_(std::ifstream& src);
+
+  unsigned int init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word);
 
 };
 #endif

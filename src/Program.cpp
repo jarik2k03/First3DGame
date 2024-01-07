@@ -55,8 +55,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         goto render;
       }
 
-      messenger.hide_cursor();
-      messenger.set_cursor_middle();
+      //messenger.hide_cursor();
+      //messenger.set_cursor_middle();
 
       if (messenger.is_pressed('W') && !messenger.is_pressed(VK_F3)) {
         eye.move_straight(0.4f);

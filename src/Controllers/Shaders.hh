@@ -8,13 +8,16 @@
 #include <_Commons/modtype.h>
 
 #include <boost/tokenizer.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/erase.hpp>
 
 #include <fstream>
 #include <d3dcompiler.h>
 #include <map>
 #include <unordered_map>
 #include <vector>
+
+using hlsl_datatypes = std::unordered_map<stlstr, int>;
+// stlstr - название типа; int - размер; 
 
 using struct_name = stlstr;
 using struct_size = unsigned int;
@@ -48,12 +51,17 @@ class Shaders {
   std::unordered_map<stlstr, ID3D11InputLayout*> vertexLayouts; // набор вершинных макетов
   std::unordered_map<filename, std::pair<const_buffers, compiled_shaders>> file;
   std::vector<stlstr> versions;
-  std::map<stlstr, int> hlsl_types;
+  hlsl_datatypes hlsl_types;
   HRESULT compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** blobOut);
 
   std::vector<stlstr> parse_hlsl_file_(std::ifstream& src);
 
   unsigned int init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word);
 
+  int calc_type_size___(const stlcstr& type);
+
 };
+
+
+void remove_hlsl_comments(stlstr&& filedata);
 #endif

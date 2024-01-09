@@ -3,8 +3,10 @@
 #define PACK_SIZE 16
 
 #define ERRMSG(text)                                               \
-  MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONHAND); \
+  MessageBoxA(NULL, text, "Ошибка шейдеров", MB_OK | MB_ICONHAND); \
   exit(-1);
+
+#define WARNMSG(text) MessageBoxA(NULL, text, "Ошибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
 
 #define H_ERRMSG(hr, text)                                           \
   if (FAILED(hr)) {                                                  \
@@ -14,10 +16,9 @@
 #define H_WARNMSG(hr, text) \
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"Ошибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
-
 Shaders::Shaders()
     : versions({"s_4_0", "s_4_1", "s_5_0"}),
-      hlsl_types({{"int", 4}, {"dword", 4}, {"float", 4}, {"half", 2}, {"bool", 1}, {"matrix", 64}, {"float2", 8}, {"float3", 12}}) {
+      hlsl_types({{"int", 4}, {"DWORD", 4}, {"half", 2}, {"bool", 1}, {"matrix", 64}, {"float", 4}}) {
 }
 
 Shaders::~Shaders() {
@@ -67,7 +68,7 @@ int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
 
   std::ifstream src(filepath.c_str());
   if (!src) {
-    ERRMSG(L"Отстутствует шейдер-файл в текущем каталоге.");
+    ERRMSG("Отстутствует шейдер-файл в текущем каталоге.");
   }
   auto doc = parse_hlsl_file_(src);
 
@@ -79,42 +80,90 @@ int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
 
 std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   std::vector<stlstr> read;
-  //const_buffers cb_umap;
+  // const_buffers cb_umap;
 
-  separator delim(" \n", ":;(){}[]");
-  stlcstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
+  separator delim(" \n", ",:;(){}[]");
+  stlstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
+  remove_hlsl_comments(std::move(file_string));
+
   tokenizer tok(file_string, delim);
 
-  sstream ss;
   for (auto it = tok.begin(); it != tok.end(); ++it) {
-    ss << *it << " ";
     if (*it == "struct") {
       init_hlsl_struct__(std::move(it));
+      break;
     }
   }
-  COUTNL(ss);
 
   return read;
 }
 
 unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word) {
+  sstream ss;
   stlcstr name = *(++word);
-  int free_space = PACK_SIZE, fullsize = 0;
-  while (word->at(0) != '}') {
-    if (*word == "struct") {
-      ++word; // случай struct Temp tmp; <=> Temp tmp;
+  ++word; // {
+  int offset = 0, n = 0;
+  while (*(++word) != "}") {
+    if (*word == "struct") // случай: struct Temp tmp; <=> Temp tmp;
+      ++word;
+    const int type_size = calc_type_size___(*word);
+  repeat:
+    if (offset + type_size > n * PACK_SIZE) {
+      offset = n * PACK_SIZE + type_size;
+      n += (type_size < PACK_SIZE) ? 1 : (type_size / PACK_SIZE);
+    } else {
+      offset += type_size;
     }
-    //int type_size = hlsl_types.find(*(++word))->second; // Temp
-    //free_space -= type_size;
-    if (free_space <= 0) {
-      //free_space = -free_space % type_size, fullsize += type_size;
-    }
-
-    *(++word); // название переменной [optional] // tmp
-    *(++word); // ;
+    *(++word); // название переменной [optional]
+    if (*(++word) == ",") //
+      goto repeat;
   }
+  hlsl_types.insert({name, offset}); // сохранена объявленная структура
 
-  return fullsize;
+  ss << "offset: " << offset;
+  COUTNL(ss);
+
+  return offset;
+}
+
+void remove_hlsl_comments(stlstr&& filedata) {
+  bool c_diap = false, c_line = false;
+  static char prev = ' ';
+  const auto remove_comments = [&c_diap, &c_line](char cc) {
+
+    if (prev == '/' && cc == '*')
+      c_diap = true;
+    else if (prev == '*' && cc == '/')
+      c_diap = false;
+    else if (prev == '/' && cc == '/')
+      c_line = true;
+    else if (cc == '\n')
+      c_line = false;
+    prev = cc;
+
+    return c_line | c_diap;
+  };
+  auto it = std::remove_if(filedata.begin(), filedata.end(), remove_comments);
+
+  filedata.erase(it, filedata.end());
+  sstream ss(filedata);
+  COUTNL(ss);
+}
+
+int Shaders::calc_type_size___(stlcstr& type) {
+  auto f = std::find_if(type.begin(), type.end(), ::isdigit);
+  stlcstr raw_type(type.begin(), f), value(f, type.end());
+  auto t = hlsl_types.find(raw_type); // Temp
+  if (value.empty())
+    return t->second;
+
+  int row_size = value.at(0) - '0';
+  if (value.size() == 1) // float1, half2, int3 ...
+    return t->second * row_size;
+
+  int col_size = value.at(2) - '0';
+  if (value.size() == 3) // float4x4, float1x3, int2x2 ...
+    return t->second * 4 * col_size;
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

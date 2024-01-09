@@ -2,20 +2,14 @@ Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
 struct Block {
-  half id;
-  half number;
-} b; 
-
-struct Tempor {
-  Block bl;
-};
-
-cbuffer Counter : register (b5) {
+  float1x3 id, ide;
+  half1 number;
+}; 
+cbuffer Counter : /* PARANOYA*/ register(b5) {
   int counter;
   int csize;
   int carea;
-}
-
+} 
 cbuffer ChunkPosBuffer : register(b4) {
   int visible_blocks[4096];
 }
@@ -24,7 +18,8 @@ cbuffer PositionBuffer : register(b0) { // b0 - индекс буфера
   matrix world;
 }
 cbuffer LightBuffer : register(b1) { // b1 - индекс буфера
-  float4 dir;
+  float4 /* oldfjsjgdfkgdjldjdgkljgljglkdjglksdjsldjdfkjkgdsjsgdjlljlk
+		 gdskjgdlglgl/*/ dir;
   float4 src_color;
   float4 dest_color;
 }
@@ -93,7 +88,7 @@ PS_OUTPUT VS_Chunk(VS_INPUT input) {
 
 float4 PS_Out(PS_OUTPUT input) : SV_Target {
   float4 color = 0.35f;
-  color += saturate(dot(dir * 0.1, input.norm) * src_color);
+  color += saturate(dot(dir, input.norm) * src_color);
   color *= dirt.Sample(sample_linear_mip, input.tex);
 
   float4 c = (float)counter / 255;

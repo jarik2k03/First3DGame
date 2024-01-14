@@ -128,24 +128,21 @@ unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr
 
 void remove_hlsl_comments(stlstr&& filedata) {
   bool c_diap = false, c_line = false;
-  static char prev = ' ';
-  const auto remove_comments = [&c_diap, &c_line](char cc) {
-
-    if (prev == '/' && cc == '*')
-      c_diap = true;
-    else if (prev == '*' && cc == '/')
-      c_diap = false;
-    else if (prev == '/' && cc == '/')
-      c_line = true;
-    else if (cc == '\n')
-      c_line = false;
-    prev = cc;
-
+  const auto func = [&](const char& cur) {
+    const char next = filedata.at(&cur - &*filedata.begin() + 1); // сл. буква (адресная арифметика)
+    const char prev = filedata.at(&cur - &*filedata.begin() - 1); // пред. буква (адресная арифметика)
+    if (cur == '/' && next == '*')
+      return static_cast<int>(c_diap = true);
+    if (prev == '*' && cur == '/')
+      return static_cast<int>(~(c_diap = false)); // стираем '/' и запрещаем стирание
+    if (cur == '/' && next == '/')
+      return static_cast<int>(c_line = true);
+    if (cur == '\n')
+      return static_cast<int>(c_line = false); // конец "//"-комментария (c_line)
     return c_line | c_diap;
   };
-  auto it = std::remove_if(filedata.begin(), filedata.end(), remove_comments);
-
-  filedata.erase(it, filedata.end());
+  auto it = std::remove_if(filedata.begin() + 1, filedata.end() - 1, func);
+  filedata.erase(it, filedata.end()); 
   sstream ss(filedata);
   COUTNL(ss);
 }
@@ -157,11 +154,11 @@ int Shaders::calc_type_size___(stlcstr& type) {
   if (value.empty())
     return t->second;
 
-  int row_size = value.at(0) - '0';
+  int row_size = value.at(0) - '0'; // char to int
   if (value.size() == 1) // float1, half2, int3 ...
     return t->second * row_size;
 
-  int col_size = value.at(2) - '0';
+  int col_size = value.at(2) - '0'; // char to int
   if (value.size() == 3) // float4x4, float1x3, int2x2 ...
     return t->second * 4 * col_size;
 }

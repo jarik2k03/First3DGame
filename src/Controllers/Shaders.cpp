@@ -85,6 +85,9 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   separator delim(" \n", ",:;(){}[]");
   stlstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
   remove_hlsl_comments(std::move(file_string));
+  sstream ss(file_string);
+  COUTNL(ss);
+
 
   tokenizer tok(file_string, delim);
 
@@ -128,9 +131,10 @@ unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr
 
 void remove_hlsl_comments(stlstr&& filedata) {
   bool c_diap = false, c_line = false;
-  const auto func = [&](const char& cur) {
-    const char next = filedata.at(&cur - &*filedata.begin() + 1); // сл. буква (адресная арифметика)
-    const char prev = filedata.at(&cur - &*filedata.begin() - 1); // пред. буква (адресная арифметика)
+  const auto has_comment = [&](const char& cur) {
+    const size_t cur_index = &cur - &*filedata.begin(); // индекс cur элемента (адресная арифметика)
+    const char next = filedata.at(cur_index + 1); // сл. буква
+    const char prev = (cur_index != 0) ? filedata.at(cur_index - 1) : ' '; // пред. буква
     if (cur == '/' && next == '*')
       return static_cast<int>(c_diap = true);
     if (prev == '*' && cur == '/')
@@ -141,10 +145,8 @@ void remove_hlsl_comments(stlstr&& filedata) {
       return static_cast<int>(c_line = false); // конец "//"-комментария (c_line)
     return c_line | c_diap;
   };
-  auto it = std::remove_if(filedata.begin() + 1, filedata.end() - 1, func);
+  auto it = std::remove_if(filedata.begin(), filedata.end() - 1, has_comment);
   filedata.erase(it, filedata.end()); 
-  sstream ss(filedata);
-  COUTNL(ss);
 }
 
 int Shaders::calc_type_size___(stlcstr& type) {
@@ -160,7 +162,7 @@ int Shaders::calc_type_size___(stlcstr& type) {
 
   int col_size = value.at(2) - '0'; // char to int
   if (value.size() == 3) // float4x4, float1x3, int2x2 ...
-    return t->second * 4 * col_size;
+    return (t->second * 4 * (col_size - 1)) + ((4 - row_size));
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

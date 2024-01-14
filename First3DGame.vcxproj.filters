@@ -46,4 +46,7 @@
     <None Include=".clang-format" />
     <None Include="First3DGame.exe" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\Shaders\simple.log" />
+  </ItemGroup>
 </Project>

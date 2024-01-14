@@ -1,12 +1,11 @@
-/*eeeeeee//fdj;fdkhfdksdhdsfgohoghoidfhog */
 Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
 struct Block {
-  float1x3 id, ide;
-  half1 number;
+  float1x3 id;
+  //half1 number;
 }; 
-cbuffer Counter : /* PARANOYA*/ register(b5) {
+cbuffer Counter : register(b5) {
   int counter;
   int csize;
   int carea;
@@ -19,8 +18,7 @@ cbuffer PositionBuffer : register(b0) { // b0 - индекс буфера
   matrix world;
 }
 cbuffer LightBuffer : register(b1) { // b1 - индекс буфера
-  float4 /* oldfjsjgdfkgdjldjdgkljgljglkdjglksdjsldjdfkjkgdsjsgdjlljlk
-		 gdskjgdlglgl/*/ dir;
+  float4 dir;
   float4 src_color;
   float4 dest_color;
 }

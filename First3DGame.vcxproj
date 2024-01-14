@@ -135,6 +135,10 @@
       <ShaderType>Effect</ShaderType>
       <CompileD2DCustomEffect>
       </CompileD2DCustomEffect>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AssemblerOutput>AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile>src/Shaders/simple.log</AssemblerOutputFile>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,6 +162,10 @@
       <ShaderModel>4.0</ShaderModel>
       <EnableDebuggingInformation>true</EnableDebuggingInformation>
       <ShaderType>Effect</ShaderType>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AssemblerOutput>AssemblyCode</AssemblerOutput>
+      <AssemblerOutputFile>src/Shaders/simple.log</AssemblerOutputFile>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -205,6 +213,9 @@
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="First3DGame.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\Shaders\simple.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

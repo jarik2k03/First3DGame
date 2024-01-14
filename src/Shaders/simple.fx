@@ -2,14 +2,15 @@ Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
 struct Block {
-  float1x3 id;
-  //half1 number;
-}; 
+
+
+
+};
 cbuffer Counter : register(b5) {
   int counter;
   int csize;
   int carea;
-} 
+}
 cbuffer ChunkPosBuffer : register(b4) {
   int visible_blocks[4096];
 }
@@ -97,5 +98,3 @@ float4 PS_Out(PS_OUTPUT input) : SV_Target {
 float4 PS_Light(PS_OUTPUT input) : SV_Target {
   return src_color * 2 * (dirt.Sample(sample_linear_mip, input.tex));
 }
-
-

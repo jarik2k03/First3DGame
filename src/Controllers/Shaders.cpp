@@ -18,7 +18,7 @@
     MessageBox(NULL, text, L"ќшибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
 Shaders::Shaders()
     : versions({"s_4_0", "s_4_1", "s_5_0"}),
-      hlsl_types({{"int", 4}, {"DWORD", 4}, {"half", 2}, {"bool", 1}, {"matrix", 64}, {"float", 4}}) {
+      hlsl_types({{"int", 4}, {"DWORD", 4}, {"half", 4}, {"bool", 4}, {"matrix", 64}, {"float", 4}}) {
 }
 
 Shaders::~Shaders() {
@@ -86,8 +86,7 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   stlstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
   remove_hlsl_comments(std::move(file_string));
   sstream ss(file_string);
-  COUTNL(ss);
-
+  //COUTNL(ss);
 
   tokenizer tok(file_string, delim);
 
@@ -102,7 +101,6 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
 }
 
 unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word) {
-  sstream ss;
   stlcstr name = *(++word);
   ++word; // {
   int offset = 0, n = 0;
@@ -113,19 +111,15 @@ unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr
   repeat:
     if (offset + type_size > n * PACK_SIZE) {
       offset = n * PACK_SIZE + type_size;
-      n += (type_size < PACK_SIZE) ? 1 : (type_size / PACK_SIZE);
+      n += std::ceilf((float)type_size / PACK_SIZE);
     } else {
       offset += type_size;
     }
     *(++word); // название переменной [optional]
-    if (*(++word) == ",") //
+    if (*(++word) == ",") // выполн€ем часть цикла дл€ переменной того же типа
       goto repeat;
   }
   hlsl_types.insert({name, offset}); // сохранена объ€вленна€ структура
-
-  ss << "offset: " << offset;
-  COUTNL(ss);
-
   return offset;
 }
 
@@ -146,7 +140,7 @@ void remove_hlsl_comments(stlstr&& filedata) {
     return c_line | c_diap;
   };
   auto it = std::remove_if(filedata.begin(), filedata.end() - 1, has_comment);
-  filedata.erase(it, filedata.end()); 
+  filedata.erase(it, filedata.end());
 }
 
 int Shaders::calc_type_size___(stlcstr& type) {
@@ -155,14 +149,13 @@ int Shaders::calc_type_size___(stlcstr& type) {
   auto t = hlsl_types.find(raw_type); // Temp
   if (value.empty())
     return t->second;
-
   int row_size = value.at(0) - '0'; // char to int
   if (value.size() == 1) // float1, half2, int3 ...
     return t->second * row_size;
-
   int col_size = value.at(2) - '0'; // char to int
+  int aligned_size = t->second * 4 * (col_size - 1);
   if (value.size() == 3) // float4x4, float1x3, int2x2 ...
-    return (t->second * 4 * (col_size - 1)) + ((4 - row_size));
+    return aligned_size + (t->second * row_size);
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

@@ -86,13 +86,15 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   stlstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
   remove_hlsl_comments(std::move(file_string));
   sstream ss(file_string);
-  //COUTNL(ss);
+  // COUTNL(ss);
 
   tokenizer tok(file_string, delim);
 
   for (auto it = tok.begin(); it != tok.end(); ++it) {
     if (*it == "struct") {
-      init_hlsl_struct__(std::move(it));
+      sstream ss;
+      ss << init_hlsl_struct__(std::move(it));
+      COUTNL(ss);
       break;
     }
   }
@@ -102,20 +104,27 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
 
 unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word) {
   stlcstr name = *(++word);
-  ++word; // {
   int offset = 0, n = 0;
+  ++word; // {
   while (*(++word) != "}") {
     if (*word == "struct") // случай: struct Temp tmp; <=> Temp tmp;
       ++word;
-    const int type_size = calc_type_size___(*word);
+    int type_size = calc_type_size___(*word);
+
   repeat:
+    *(++word); // название переменной [optional]
+    int arr_length = 1;
+    if (*(++word) == "[") {
+      arr_length = std::stoi(*(++word)); // длина массива
+      ++word; // "]"
+    }
+    type_size = calc_array_size___(type_size, arr_length);
     if (offset + type_size > n * PACK_SIZE) {
       offset = n * PACK_SIZE + type_size;
       n += std::ceilf((float)type_size / PACK_SIZE);
     } else {
       offset += type_size;
     }
-    *(++word); // название переменной [optional]
     if (*(++word) == ",") // выполняем часть цикла для переменной того же типа
       goto repeat;
   }
@@ -156,6 +165,11 @@ int Shaders::calc_type_size___(stlcstr& type) {
   int aligned_size = t->second * 4 * (col_size - 1);
   if (value.size() == 3) // float4x4, float1x3, int2x2 ...
     return aligned_size + (t->second * row_size);
+}
+
+int Shaders::calc_array_size___(const int type_size, const int length) {
+  int aligned_size = std::ceilf((float)type_size / PACK_SIZE) * PACK_SIZE * (length - 1);
+  return aligned_size + type_size;
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

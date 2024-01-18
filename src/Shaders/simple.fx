@@ -2,7 +2,9 @@ Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
 struct Block {
-  half1x2 r[4], rc[2];
+
+  int1x3 blend_a_med[1];
+  float3 mad[1];
 };
 cbuffer Counter : register(b5) {
   int counter;

@@ -36,6 +36,7 @@ using filename = stlwstr;
 using separator = boost::char_separator<char>;
 using tokenizer = boost::tokenizer<separator>;
 
+using token_iterator_t = boost::token_iterator<separator, stlstr::const_iterator, stlstr>;
 
 class Shaders {
  public:
@@ -56,9 +57,13 @@ class Shaders {
 
   std::vector<stlstr> parse_hlsl_file_(std::ifstream& src);
 
-  unsigned int init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word);
+  unsigned int init_hlsl_struct__(token_iterator_t&& word);
+
+  void calc_offset_n(int type_size, token_iterator_t&& word, int&& offset, int&& n);
 
   int calc_type_size___(const stlcstr& type);
+
+  int calc_array_size___(const int type_size, const int length);
 
 };
 

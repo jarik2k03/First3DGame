@@ -102,34 +102,36 @@ std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
   return read;
 }
 
-unsigned int Shaders::init_hlsl_struct__(boost::token_iterator<separator, stlstr::const_iterator, stlstr>&& word) {
+unsigned int Shaders::init_hlsl_struct__(token_iterator_t&& word) {
   stlcstr name = *(++word);
   int offset = 0, n = 0;
   ++word; // {
   while (*(++word) != "}") {
     if (*word == "struct") // случай: struct Temp tmp; <=> Temp tmp;
       ++word;
-    int type_size = calc_type_size___(*word);
-
-  repeat:
-    *(++word); // название переменной [optional]
-    int arr_length = 1;
-    if (*(++word) == "[") {
-      arr_length = std::stoi(*(++word)); // длина массива
-      ++word; // "]"
-    }
-    type_size = calc_array_size___(type_size, arr_length);
-    if (offset + type_size > n * PACK_SIZE) {
-      offset = n * PACK_SIZE + type_size;
-      n += std::ceilf((float)type_size / PACK_SIZE);
-    } else {
-      offset += type_size;
-    }
-    if (*(++word) == ",") // выполняем часть цикла для переменной того же типа
-      goto repeat;
+    int type_size = calc_type_size___(*(word));
+    do { // как минимум одна переменная должна быть объявлена
+      calc_offset_n(type_size, std::move(word), std::move(offset), std::move(n));
+    } while (*(word) == ",");
   }
   hlsl_types.insert({name, offset}); // сохранена объявленная структура
   return offset;
+}
+
+void Shaders::calc_offset_n(int type_size, token_iterator_t&& word, int&& offset, int&& n) {
+  int arr_length = 1, is_array_type = false;
+  ++word, ++word; // "," -> "varname" -> ("[") или (",") 
+  if (*(word) == "[") {
+    arr_length = std::stoi(*(++word)); // длина массива "[" -> "ARR_SIZE"
+    is_array_type = true, ++word, ++word; // "ARR_SIZE" -> "]" -> ","
+  }
+  type_size = calc_array_size___(type_size, arr_length);
+  if (offset + type_size > n * PACK_SIZE || is_array_type == true) {
+    offset = n * PACK_SIZE + type_size;
+    n += std::ceilf((float)type_size / PACK_SIZE);
+  } else {
+    offset += type_size;
+  } 
 }
 
 void remove_hlsl_comments(stlstr&& filedata) {

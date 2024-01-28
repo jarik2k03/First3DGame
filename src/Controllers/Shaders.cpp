@@ -1,6 +1,8 @@
 #include "Shaders.hh"
+#include <_Commons/str_switch.h>
 
 #define PACK_SIZE 16
+#define FAIL_PASRE_STRUCT 0
 
 #define ERRMSG(text)                                               \
   MessageBoxA(NULL, text, "ќшибка шейдеров", MB_OK | MB_ICONHAND); \
@@ -16,6 +18,7 @@
 #define H_WARNMSG(hr, text) \
   if (FAILED(hr))           \
     MessageBox(NULL, text, L"ќшибка шейдеров", MB_OK | MB_ICONEXCLAMATION);
+
 Shaders::Shaders()
     : versions({"s_4_0", "s_4_1", "s_5_0"}),
       hlsl_types({{"int", 4}, {"DWORD", 4}, {"half", 4}, {"bool", 4}, {"matrix", 64}, {"float", 4}}) {
@@ -61,7 +64,7 @@ ID3D11PixelShader* Shaders::addPixelShader(stlcwstr& filename, stlcstr& entryPoi
   return pShader;
 }
 
-int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
+shader_blob Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
   auto supported_version = std::find(versions.begin(), versions.end(), shader_version);
   if (supported_version == versions.end())
     std::runtime_error e("Ќедоступна€ верси€ шейдера.");
@@ -75,55 +78,118 @@ int Shaders::compile_file(stlcwstr& filepath, stlcstr& shader_version) {
   //    hr = D3DX11CompileFromFileW(
   //    filename.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(),
   //    shaderFlags, 0, NULL, o_blob, &errInfo, NULL);
-  return 0;
+  return shader_blob(
+      {
+          {"Counter", ConstBuffer(5, 16)},
+          {"ChunkPosBuffer", ConstBuffer(4, 65660)},
+          {"PositionBuffer", ConstBuffer(0, 64)},
+          {"LightBuffer", ConstBuffer(1, 48)},
+          {"ViewBuffer", ConstBuffer(2, 64)},
+          {"ProjBuffer", ConstBuffer(3, 64)},
+          {"PositionBuffer", ConstBuffer(0, 64)},
+          {"temp", ConstBuffer(12, 636)},
+          {"tem", ConstBuffer(9, 124)},
+      },
+      {});
 }
 
 std::vector<stlstr> Shaders::parse_hlsl_file_(std::ifstream& src) {
-  std::vector<stlstr> read;
   // const_buffers cb_umap;
-
+  sstream ss;
   separator delim(" \n", ",:;(){}[]");
   stlstr file_string = {std::istreambuf_iterator<char>(src), std::istreambuf_iterator<char>()};
   remove_hlsl_comments(std::move(file_string));
-  sstream ss(file_string);
-  // COUTNL(ss);
 
   tokenizer tok(file_string, delim);
-
-  for (auto it = tok.begin(); it != tok.end(); ++it) {
-    if (*it == "struct") {
-      sstream ss;
-      ss << init_hlsl_struct__(std::move(it));
-      COUTNL(ss);
+  std::vector<stlstr> data(tok.begin(), tok.end());
+  for (auto it = data.begin(); it != data.end(); ++it) {
+    SWITCH(*it) {
+      CASE("struct") : init_hlsl_struct(std::move(it));
       break;
+      // CASE("cbuffer") : ss << "cbuffer: " << init_hlsl_cbuffer__(std::move(++it)) << " ";
+      // break;
     }
   }
 
-  return read;
+  COUTNL(ss);
+  return data;
 }
 
-unsigned int Shaders::init_hlsl_struct__(token_iterator_t&& word) {
-  stlcstr name = *(++word);
-  int offset = 0, n = 0;
-  ++word; // {
+std::size_t Shaders::init_hlsl_struct(std::vector<stlstr>::iterator&& word, bool in_cb) {
+  int offset = 0, n = 0, type_size = 0;
+  stlstr name = *(++word); // struct -> "name" || "{"
+  name = (name == "{") ? "<unnamed>" : *(word++);
+
   while (*(++word) != "}") {
-    if (*word == "struct") // случай: struct Temp tmp; <=> Temp tmp;
-      ++word;
-    int type_size = calc_type_size___(*(word));
+    if (*(word += 2) == "struct")
+      if (*(word + 1) == "{") { // обнаруживаем временную структуру
+        type_size = (*(word + 1) == "{") ? init_temp_hlsl_struct(std::move(word)) : calc_type_size___(*(++word));
+      }
     do { // как минимум одна переменна€ должна быть объ€влена
-      calc_offset_n(type_size, std::move(word), std::move(offset), std::move(n));
+      calc_variable(type_size, std::move(word), std::move(offset), std::move(n));
     } while (*(word) == ",");
   }
-  hlsl_types.insert({name, offset}); // сохранена объ€вленна€ структура
+  if (!in_cb)
+    return offset;
+  int size = offset;
+  while (*word != ";") { // вычисление после объ€влени€ структуры
+    calc_variable(offset, std::move(word), std::move(size), std::move(n));
+  }
+  word += 1;
+  return size;
+}
+
+std::size_t Shaders::init_temp_hlsl_struct(std::vector<stlstr>::iterator&& word) {
+  int offset = 0, n = 0, type_size = 0;
+  while (*(++word) != "}") {
+    if (*(word += 2) == "struct") {
+      type_size = (*(word + 1) == "{") ? init_temp_hlsl_struct(std::move(word)) : calc_type_size___(*(++word));
+    }
+    do { // как минимум одна переменна€ должна быть объ€влена
+      calc_variable(type_size, std::move(word), std::move(offset), std::move(n));
+    } while (*(word) == ",");
+  }
+  int size = offset;
+  while (*word != ";") { // вычисление после объ€влени€ структуры
+    calc_variable(offset, std::move(word), std::move(size), std::move(n));
+  }
+  word += 1;
+  return size;
+}
+
+std::size_t Shaders::init_hlsl_cbuffer__(std::vector<stlstr>::iterator&& word) {
+  sstream ss;
+  stlcstr name = *(word);
+  ++word, ++word, ++word; // "Name" -> ":" -> "register" -> "("
+  int buf_id = std::stoi(stlcstr(*(++word), 1)); // "b1"
+  ss << "cbuffer id: " << buf_id << '\n';
+  ++word, ++word; // ")" -> "{"
+  int offset = 0, n = 0, tempstruct_size = FAIL_PASRE_STRUCT;
+  while (*(++word) != "}") {
+    if (*word == "struct")
+      if ((tempstruct_size = init_hlsl_struct(std::move((word)))) == FAIL_PASRE_STRUCT) {
+        ++word; // случай: struct Temp tmp; <=> Temp tmp;
+      }
+    int type_size = (tempstruct_size == FAIL_PASRE_STRUCT) ? calc_type_size___(*(word)) : tempstruct_size;
+    ss << "  type_size: " << type_size << '\n';
+    do { // как минимум одна переменна€ должна быть объ€влена
+      calc_variable(type_size, std::move(word), std::move(offset), std::move(n));
+    } while (*(word) == ",");
+  }
+  ss << "cbuffer size: " << offset << '\n';
+  COUTNL(ss);
   return offset;
 }
 
-void Shaders::calc_offset_n(int type_size, token_iterator_t&& word, int&& offset, int&& n) {
+void Shaders::calc_variable(int type_size, std::vector<stlstr>::iterator&& word, int&& offset, int&& n) {
   int arr_length = 1, is_array_type = false;
-  ++word, ++word; // "," -> "varname" -> ("[") или (",") 
+  word += 2; // "," -> "varname" -> ("[") или (",")
   if (*(word) == "[") {
     arr_length = std::stoi(*(++word)); // длина массива "[" -> "ARR_SIZE"
-    is_array_type = true, ++word, ++word; // "ARR_SIZE" -> "]" -> ","
+    is_array_type = true, word += 2; // "ARR_SIZE" -> "]" -> ","
+  }
+  if (*word == ":") {
+    word += 2;
   }
   type_size = calc_array_size___(type_size, arr_length);
   if (offset + type_size > n * PACK_SIZE || is_array_type == true) {
@@ -131,7 +197,28 @@ void Shaders::calc_offset_n(int type_size, token_iterator_t&& word, int&& offset
     n += std::ceilf((float)type_size / PACK_SIZE);
   } else {
     offset += type_size;
-  } 
+  }
+}
+
+int Shaders::calc_type_size___(stlcstr& type) {
+  auto f = std::find_if(type.begin(), type.end(), ::isdigit);
+  stlcstr raw_type(type.begin(), f), value(f, type.end());
+  auto t = hlsl_types.find(raw_type); // Temp
+  if (t == hlsl_types.end())
+    return -1;
+  if (value.empty())
+    return t->second;
+  int row_size = value.at(0) - '0'; // char to int
+  if (value.size() == 1) // float1, half2, int3 ...
+    return t->second * row_size;
+  int col_size = value.at(2) - '0'; // char to int
+  int aligned_size = t->second * 4 * (col_size - 1);
+  if (value.size() == 3) // float4x4, float1x3, int2x2 ...
+    return aligned_size + (t->second * row_size);
+}
+int Shaders::calc_array_size___(const int type_size, const int length) {
+  int aligned_size = std::ceilf((float)type_size / PACK_SIZE) * PACK_SIZE * (length - 1);
+  return aligned_size + type_size;
 }
 
 void remove_hlsl_comments(stlstr&& filedata) {
@@ -152,26 +239,6 @@ void remove_hlsl_comments(stlstr&& filedata) {
   };
   auto it = std::remove_if(filedata.begin(), filedata.end() - 1, has_comment);
   filedata.erase(it, filedata.end());
-}
-
-int Shaders::calc_type_size___(stlcstr& type) {
-  auto f = std::find_if(type.begin(), type.end(), ::isdigit);
-  stlcstr raw_type(type.begin(), f), value(f, type.end());
-  auto t = hlsl_types.find(raw_type); // Temp
-  if (value.empty())
-    return t->second;
-  int row_size = value.at(0) - '0'; // char to int
-  if (value.size() == 1) // float1, half2, int3 ...
-    return t->second * row_size;
-  int col_size = value.at(2) - '0'; // char to int
-  int aligned_size = t->second * 4 * (col_size - 1);
-  if (value.size() == 3) // float4x4, float1x3, int2x2 ...
-    return aligned_size + (t->second * row_size);
-}
-
-int Shaders::calc_array_size___(const int type_size, const int length) {
-  int aligned_size = std::ceilf((float)type_size / PACK_SIZE) * PACK_SIZE * (length - 1);
-  return aligned_size + type_size;
 }
 
 HRESULT Shaders::compileFromFile(stlcwstr& filename, stlcstr& entryPoint, stlcstr& shaderModel, ID3DBlob** o_blob) {

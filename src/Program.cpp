@@ -19,21 +19,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   MsgHandler messenger;
   Shaders shader_controller;
   Modeler model_creator;
-
   auto* v = shader_controller.addVertexShader(SHADERPATH, "VS_Out");
   auto* vchunk = shader_controller.addVertexShader(SHADERPATH, "VS_Chunk");
   auto* p = shader_controller.addPixelShader(SHADERPATH, "PS_Out");
   auto* vlaychunk = shader_controller.getVertexLayout("VS_Chunk");
   auto* plight = shader_controller.addPixelShader(SHADERPATH, "PS_Light");
   
-  auto hr = shader_controller.compile_file(SHADERPATH);
+  const auto blob = shader_controller.compile_file(SHADERPATH);
 
   model_creator.create_model(L"Cube", cub_verts(), cub_idx());
   //model_creator.create_model(L"Pyramid", pyramid_verts(), pyramid_idx());
   auto cub = model_creator.get_model(L"Cube");
 
-  Camera eye(90.0f, {0, 0, 0});
-  Chunk tiny(16, {0, 0, 0}, cub, vchunk, p, vlaychunk);
+  Camera eye(110.0f, {0, 0, 0});
+  Chunk tiny(16, {0, 0, 0}, cub, blob, vchunk, p, vlaychunk);
 
   Entity lamp({7, -10, 1}, model_creator.get_model(L"Cube"), v, plight);
   lamp.set_glowing(true);

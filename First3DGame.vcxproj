@@ -80,13 +80,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\boost_1_82_0;D:\VSprojects\First3DGame\src;C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProgramW6432)\boost_1_82_0;$(ProjectDir)\src;$(ProgramW6432)\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProgramW6432)\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\boost_1_82_0;D:\VSprojects\First3DGame\src;C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProgramW6432)\boost_1_82_0;$(ProjectDir)\src;$(ProgramW6432)\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProgramW6432)\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,6 +169,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controllers\Shaders\CB_Unit.cpp" />
+    <ClCompile Include="src\Controllers\Shaders\ConstBuffer.cpp" />
     <ClCompile Include="src\Entity\Chunk.cpp" />
     <ClCompile Include="src\Entity\Block.cpp" />
     <ClCompile Include="src\Rendering\Modeler.cpp" />
@@ -181,6 +183,8 @@
     <ClCompile Include="src\Rendering\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Controllers\Shaders\CB_Unit.hh" />
+    <ClInclude Include="src\Controllers\Shaders\ConstBuffer.hh" />
     <ClInclude Include="src\Controllers\AShader.hh" />
     <ClInclude Include="src\Entity\Chunk.hh" />
     <ClInclude Include="src\Entity\Block.hh" />
@@ -197,6 +201,7 @@
     <ClInclude Include="src\Controllers\VShader.hh" />
     <ClInclude Include="src\_Commons\model_layouts.h" />
     <ClInclude Include="src\_Commons\modtype.h" />
+    <ClInclude Include="src\_Commons\str_switch.h" />
     <ClInclude Include="src\_Commons\vertex.h" />
   </ItemGroup>
   <ItemGroup>

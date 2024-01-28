@@ -1,11 +1,19 @@
 Texture2D dirt : register(t0);
 SamplerState sample_linear_mip : register(s0);
 
-struct Block {
-
+typedef struct block {
+  struct {
+    int tttt;
+  } Blow : TEXCOORD0, Bloww : TEXCOORD1;
+  struct {
+     struct {
+      int tmpor;
+    } e;
+    int tttt;
+  } Blowww : TEXCOORD0, Blowwww : TEXCOORD1;
   int1x3 blend_a_med[1];
   float3 mad[1];
-};
+} Block;
 cbuffer Counter : register(b5) {
   int counter;
   int csize;
@@ -13,6 +21,7 @@ cbuffer Counter : register(b5) {
 }
 cbuffer ChunkPosBuffer : register(b4) {
   int visible_blocks[4096];
+  struct block sze;
 }
 
 cbuffer PositionBuffer : register(b0) { // b0 - индекс буфера
@@ -32,7 +41,13 @@ cbuffer ProjBuffer : register(b3) { // b3 - матрицы камеры
 }
 
 cbuffer temp : register(b12) {
-  struct Block be;
+  struct {
+    struct {
+      int tmpor;
+    } e[16];
+    int tttt;
+  } Blowww : TEXCOORD0, Blowwww : TEXCOORD1;
+  struct block be;
 }
 
 struct VS_INPUT {
@@ -47,6 +62,12 @@ struct PS_OUTPUT // Входящие данные пиксельного шейдера
   float2 tex : TEXCOORD0; // Координаты текстуры по tu, tv
   float3 norm : TEXCOORD1;
 };
+
+cbuffer tem : register(b9) {
+
+  struct block bejhfd;
+}
+
 
 float4x4 CreateTranslationMatrix(float3 translation) {
   float4x4 translationMatrix = (float4x4)0; // Инициализация нулевой матрицы
